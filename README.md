@@ -1,4 +1,4 @@
-# GDN-DELIVERY-MANAGEMENT
+# 1640 Web Enterprise Project
 
 ## Install docker destop
 `https://docs.docker.com/desktop/`
@@ -8,6 +8,5 @@
 `docker-compose --version`
 
 ## Run app
-`docker-compose up -d`
-## Stop app
-`docker-compose down`
+`docker-compose up 
+`go run main.go

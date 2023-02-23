@@ -1,0 +1,179 @@
+r.Echo.GET("/health-check", http.HealthCheck)
+
+	r.Echo.POST("admin/sign-up", r.UserHandler.SystemAdminSignUp)
+
+	r.Echo.POST("/login", r.UserHandler.Login)
+	r.Echo.GET("/logout", r.UserHandler.Logout)
+
+
+	// r.Echo.POST("/token/refresh-token", r.UserHandler.RenewAccessToken)
+	
+	user := r.Echo.Group("/user")
+	user.POST("/add-user", r.UserHandler.AddUser)
+	user.GET("/profile", r.UserHandler.UserDetails)
+	user.GET("/get-me", r.UserHandler.GetMe, r.AuthMiddleware.Authorize())
+
+	role := r.Echo.Group("/role")
+	role.POST("/add-role", r.RoleHandler.AddRole)
+
+// POST http://localhost:1313/admin/sign-up
+    request:
+        {
+            "user_name":"admin",
+            "email":"admin.system@gmail.com",
+            "password":"admin",
+            "avatar":"sdfsdfsdfsd"
+        } 
+    response:
+        {
+            "message": "",
+            "status_code": 200,
+            "data": {
+                "id": "9f3ddb0c-acfa-11ed-bcdb-047c1606d9e2",
+                "email": "admin.system@gmail.com",
+                "user_name": "admin",
+                "avatar": "sdfsdfsdfsd",
+                "role_ticker": "SAD",
+                "password": "$2a$04$jy8bm/1BHhCmzAbE8XHHveXuUUAHWQDtCO.qnQITSCSSr2eAKEkF.",
+                "created_at": "2023-02-15T06:33:13.178818Z",
+                "updated_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                },
+                "deleted_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                }
+            }
+        }
+
+// POST http://localhost:1313/login
+    request:
+        {
+            "email":"admin.system@gmail.com",
+            "password":"admin"
+        } 
+
+    response:
+    {
+    "message": "",
+    "status_code": 200,
+    "data": {
+        "user": {
+            "id": "9f3ddb0c-acfa-11ed-bcdb-047c1606d9e2",
+            "email": "admin.system@gmail.com",
+            "user_name": "admin",
+            "avatar": "sdfsdfsdfsd",
+            "role_ticker": "SAD",
+            "password": "$2a$04$jy8bm/1BHhCmzAbE8XHHveXuUUAHWQDtCO.qnQITSCSSr2eAKEkF.",
+            "created_at": "2023-02-15T06:33:13.178818Z",
+            "updated_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+            },
+            "deleted_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+            }
+            },
+            "session_id": "7a59af96-acfe-11ed-b2ae-047c1606d9e2",
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5ZjNkZGIwYy1hY2ZhLTExZWQtYmNkYi0wNDdjMTYwNmQ5ZTIiLCJFbWFpbCI6ImFkbWluLnN5c3RlbUBnbWFpbC5jb20iLCJSb2xlX1RpY2tlciI6IiIsImV4cCI6MTY3NjQ0NTM0OX0.IS9ddbk64ZV_GVrM7DQB_fllu0ods12963C-qZsN62w",
+            "access_token_expires_at": 1676445349,
+            "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5ZjNkZGIwYy1hY2ZhLTExZWQtYmNkYi0wNDdjMTYwNmQ5ZTIiLCJFbWFpbCI6ImFkbWluLnN5c3RlbUBnbWFpbC5jb20iLCJSb2xlX1RpY2tlciI6IlNBRCIsImV4cCI6MTY3NjUzMDg0OX0.v5aoKmP745BPD6p1H-5FOXhRT5Hn7bU10S5yl_gfpIA",
+            "refresh_token_expires_at": 1676530849
+        }
+    }
+// GET http://localhost:1313/logout
+    response: 
+        {
+            "message": "",
+            "status_code": 200,
+            "data": null
+        }
+// POST http://localhost:1313/user/add-user
+    request:
+    response:
+
+// GET http://localhost:1313/user/profile
+    request:
+        {
+            id:"9f3ddb0c-acfa-11ed-bcdb-047c1606d9e2"
+        }
+    response:
+        {
+            "message": "",
+            "status_code": 200,
+            "data": {
+                "id": "9f3ddb0c-acfa-11ed-bcdb-047c1606d9e2",
+                "email": "admin.system@gmail.com",
+                "user_name": "admin",
+                "avatar": "sdfsdfsdfsd",
+                "role_ticker": "SAD",
+                "password": "$2a$04$jy8bm/1BHhCmzAbE8XHHveXuUUAHWQDtCO.qnQITSCSSr2eAKEkF.",
+                "created_at": "2023-02-15T06:33:13.178818Z",
+                "updated_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                },
+                "deleted_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                }
+            }
+        }
+
+// GET http://localhost:1313/user/get-me
+    request:
+    response:
+        {
+            "message": "",
+            "status_code": 200,
+            "data": {
+                "id": "9f3ddb0c-acfa-11ed-bcdb-047c1606d9e2",
+                "email": "admin.system@gmail.com",
+                "user_name": "admin",
+                "avatar": "sdfsdfsdfsd",
+                "role_ticker": "SAD",
+                "password": "$2a$04$jy8bm/1BHhCmzAbE8XHHveXuUUAHWQDtCO.qnQITSCSSr2eAKEkF.",
+                "created_at": "2023-02-15T06:33:13.178818Z",
+                "updated_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                },
+                "deleted_at": {
+                "Time": "0001-01-01T00:00:00Z",
+                "Valid": false
+                }
+            }
+        }
+
+// POST http://localhost:1313/role/add-role
+    request:
+    {
+        "title":"project manager",
+        "ticker":"PM"
+    }
+    response:
+    {
+        "message": "",
+        "status_code": 200,
+        "data": {
+            "ticker": "PM",
+            "title": "project manager",
+            "created_at": "2023-02-15T13:56:52.799479Z"
+        }
+    }
+
+
+    // POST http://localhost:1313/role/list-role
+    response:
+    [
+        {
+        "title": "System Admin",
+        "ticker": "SAD"
+        },
+         {
+            "title": "Project Manager",
+            "ticker": "PM"
+        },
+    ]

@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: gdn-delivery-management
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1313:1313"
+    volumes:
+      - api:/usr/src/app/  
+    depends_on:
+      - gdn_postgres  
+    command: [ "/app/main" ]
+    networks: 
+      - gdn-delivery-management
+
+
+  gdn_postgres:
+    image: postgres:14-alpine
+    container_name: gdn_postgesql
+    restart: always
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=1640
+    volumes:
+      - postgres-db:/var/lib/postgresql/data  
+    networks: 
+      - gdn-delivery-management  
+
+
+volumes:
+  postgres-db:
+  api:
+networks:
+  gdn-delivery-management:
+    driver: bridge

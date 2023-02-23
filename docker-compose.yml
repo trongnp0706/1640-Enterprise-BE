@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   api:
-    container_name: gdn-delivery-management
+    container_name: 1640-web-enterprise
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,15 +11,15 @@ services:
     volumes:
       - api:/usr/src/app/  
     depends_on:
-      - gdn_postgres  
+      - 1640_postgres
     command: [ "/app/main" ]
     networks: 
-      - gdn-delivery-management
+      - 1640-web-enterprise
 
 
-  gdn_postgres:
+  1640_postgres:
     image: postgres:14-alpine
-    container_name: gdn_postgesql
+    container_name: 1640_postgesql
     restart: always
     expose:
       - "5432"
@@ -32,12 +32,12 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data  
     networks: 
-      - gdn-delivery-management  
+      - 1640-web-enterprise
 
 
 volumes:
   postgres-db:
   api:
 networks:
-  gdn-delivery-management:
+  1640-web-enterprise:
     driver: bridge

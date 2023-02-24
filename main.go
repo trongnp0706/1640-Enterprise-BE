@@ -9,6 +9,7 @@ import (
 	"GDN-delivery-management/router"
 	"database/sql"
 	"github.com/labstack/echo/v4"
+	migrate "github.com/rubenv/sql-migrate"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +17,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
-	migrate "github.com/rubenv/sql-migrate"
 )
 
 func main() {
@@ -26,21 +26,30 @@ func main() {
 	}
 	psqlInfo := os.Getenv("DBSOURCE")
 	driver, err := sql.Open("postgres", psqlInfo)
+	Migrate(driver)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	Migrate(driver)
+
 	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
 								VALUES ('System Admin', 'SAD') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
+								VALUES ('First Department', 'FDP') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	queries := db.New(driver)
 	userRepo := repository.NewUserRepo(queries)
 	sessionRepo := repository.NewSessionRepo(queries)
 	roleRepo := repository.NewRoleRepo(queries)
+	departmentRepo := repository.NewDepartmentRepo(queries)
 	gmail := mail.NewGmailSender(os.Getenv("EMAIL_SENDER_NAME"), os.Getenv("EMAIL_SENDER_ADDRESS"), os.Getenv("EMAIL_SENDER_PASSWORD"))
 	userHandle := handle.UserHandler{
 		UserRepo:    userRepo,
@@ -50,7 +59,9 @@ func main() {
 	roleHandler := handle.RoleHandler{
 		RoleRepo: roleRepo,
 	}
-
+	departmentHandler := handle.DepartmentHandler{
+		DepartmentRepo: departmentRepo,
+	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 
 	e := echo.New()
@@ -58,13 +69,14 @@ func main() {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
-	router := router.Router{
-		Echo:           e,
-		UserHandler:    userHandle,
-		RoleHandler:    roleHandler,
-		AuthMiddleware: authMiddleware,
+	routerSetup := router.Router{
+		Echo:              e,
+		UserHandler:       userHandle,
+		RoleHandler:       roleHandler,
+		DepartmentHandler: departmentHandler,
+		AuthMiddleware:    authMiddleware,
 	}
-	router.SetupRouter()
+	routerSetup.SetupRouter()
 	e.Logger.Fatal(e.Start(":1313"))
 }
 

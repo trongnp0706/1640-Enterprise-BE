@@ -7,10 +7,11 @@ import (
 )
 
 type Router struct {
-	Echo           *echo.Echo
-	UserHandler    http.UserHandler
-	RoleHandler    http.RoleHandler
-	AuthMiddleware *mdw.AuthMiddleware
+	Echo              *echo.Echo
+	UserHandler       http.UserHandler
+	RoleHandler       http.RoleHandler
+	DepartmentHandler http.DepartmentHandler
+	AuthMiddleware    *mdw.AuthMiddleware
 }
 
 func (r *Router) SetupRouter() {
@@ -40,4 +41,10 @@ func (r *Router) SetupRouter() {
 	role.GET("/all-role", r.RoleHandler.ListRoles, r.AuthMiddleware.Authorize())
 	role.PATCH("/update-role", r.RoleHandler.UpdateRole, r.AuthMiddleware.Authorize())
 	role.DELETE("/delete-role", r.RoleHandler.DeleteRole, r.AuthMiddleware.Authorize())
+
+	department := r.Echo.Group("/department")
+	department.POST("/add-department", r.DepartmentHandler.CreateDepartment, r.AuthMiddleware.Authorize())
+	department.GET("/all-department", r.DepartmentHandler.GetAllDepartments, r.AuthMiddleware.Authorize())
+	department.PATCH("/update-department", r.DepartmentHandler.UpdateDepartment, r.AuthMiddleware.Authorize())
+	department.DELETE("/delete-department", r.DepartmentHandler.DeleteDepartment, r.AuthMiddleware.Authorize())
 }

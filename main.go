@@ -38,6 +38,12 @@ func main() {
 		log.Println(err)
 		return
 	}
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('User', 'USR') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
 								VALUES ('First Department', 'FDP') ON CONFLICT DO NOTHING`)
 	if err != nil {
@@ -50,6 +56,7 @@ func main() {
 	sessionRepo := repository.NewSessionRepo(queries)
 	roleRepo := repository.NewRoleRepo(queries)
 	departmentRepo := repository.NewDepartmentRepo(queries)
+	categoryRepo := repository.NewCategoryRepo(queries)
 	gmail := mail.NewGmailSender(os.Getenv("EMAIL_SENDER_NAME"), os.Getenv("EMAIL_SENDER_ADDRESS"), os.Getenv("EMAIL_SENDER_PASSWORD"))
 	userHandle := handle.UserHandler{
 		UserRepo:    userRepo,
@@ -61,6 +68,9 @@ func main() {
 	}
 	departmentHandler := handle.DepartmentHandler{
 		DepartmentRepo: departmentRepo,
+	}
+	categoryHandler := handle.CategoryHandler{
+		CategoryRepo: categoryRepo,
 	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 
@@ -74,6 +84,7 @@ func main() {
 		UserHandler:       userHandle,
 		RoleHandler:       roleHandler,
 		DepartmentHandler: departmentHandler,
+		CategoryHandler:   categoryHandler,
 		AuthMiddleware:    authMiddleware,
 	}
 	routerSetup.SetupRouter()
@@ -98,20 +109,16 @@ func Migrate(db *sql.DB) {
 
 func accessibleRoles() map[string][]string {
 	return map[string][]string{
-		"user/add-user":        {"SAD", "GL"},
-		"user/update-user":     {"SAD", "GL"},
-		"user/delete-user":     {"SAD", "GL"},
-		"user/add-avatar":      {"SAD", "GL"},
-		"user/all-user":        {"SAD", "GL"},
-		"user/profile":         {"SAD", "GL", "PM"},
-		"user/get-me":          {"SAD", "GL", "PM"},
-		"role/add-role":        {"SAD", "GL"},
-		"role/all-role":        {"SAD", "GL"},
-		"role/update-role":     {"SAD", "GL"},
-		"role/delete-role":     {"SAD", "GL"},
-		"client/add-client":    {"SAD", "GL"},
-		"client/all-client":    {"SAD", "GL"},
-		"client/update-client": {"SAD", "GL"},
-		"client/close-client":  {"SAD", "GL"},
+		"user/add-user":    {"SAD", "GL"},
+		"user/update-user": {"SAD", "GL"},
+		"user/delete-user": {"SAD", "GL"},
+		"user/add-avatar":  {"SAD", "GL"},
+		"user/all-user":    {"SAD", "GL"},
+		"user/profile":     {"SAD", "GL", "PM"},
+		"user/get-me":      {"SAD", "GL", "PM"},
+		"role/add-role":    {"SAD", "GL"},
+		"role/all-role":    {"SAD", "GL"},
+		"role/update-role": {"SAD", "GL"},
+		"role/delete-role": {"SAD", "GL"},
 	}
 }

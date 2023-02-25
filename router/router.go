@@ -11,6 +11,7 @@ type Router struct {
 	UserHandler       http.UserHandler
 	RoleHandler       http.RoleHandler
 	DepartmentHandler http.DepartmentHandler
+	CategoryHandler   http.CategoryHandler
 	AuthMiddleware    *mdw.AuthMiddleware
 }
 
@@ -47,4 +48,10 @@ func (r *Router) SetupRouter() {
 	department.GET("/all-department", r.DepartmentHandler.GetAllDepartments, r.AuthMiddleware.Authorize())
 	department.PATCH("/update-department", r.DepartmentHandler.UpdateDepartment, r.AuthMiddleware.Authorize())
 	department.DELETE("/delete-department", r.DepartmentHandler.DeleteDepartment, r.AuthMiddleware.Authorize())
+
+	category := r.Echo.Group("/category")
+	category.POST("/add-category", r.CategoryHandler.CreateCategory, r.AuthMiddleware.Authorize())
+	category.GET("/all-category", r.CategoryHandler.GetAllCategories, r.AuthMiddleware.Authorize())
+	category.PATCH("/update-category", r.CategoryHandler.UpdateCategory, r.AuthMiddleware.Authorize())
+	category.DELETE("/delete-category", r.CategoryHandler.DeleteCategory, r.AuthMiddleware.Authorize())
 }

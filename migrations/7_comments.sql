@@ -5,6 +5,7 @@ CREATE TABLE "comments" (
                             "is_anonymous" BOOLEAN NOT NULL,
                             "user_id" varchar NOT NULL,
                             "idea_id" varchar NOT NULL,
+                            "created_at" TIMESTAMP NOT NULL,
                             CONSTRAINT "comments_pk" PRIMARY KEY ("id")
 );
 

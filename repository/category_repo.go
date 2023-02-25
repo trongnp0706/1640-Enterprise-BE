@@ -48,7 +48,7 @@ func (c *CategoryRepo) CreateCategory(ctx context.Context, input entity.CreateCa
 			}
 		}
 		log.Println("err: ", err)
-		return errors.New("Failed to add role"), entity.Category{}
+		return errors.New("Failed to add category"), entity.Category{}
 	}
 	return nil, category
 }
@@ -79,7 +79,7 @@ func (c *CategoryRepo) DeleteCategory(ctx context.Context, ticker string) (error
 	category, err := c.sql.DeleteCategory(ctx, ticker)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errors.New("ticker not found"), entity.Category{}
+			return errors.New("id not found"), entity.Category{}
 		}
 		return err, entity.Category{}
 	}

@@ -57,6 +57,7 @@ func main() {
 	roleRepo := repository.NewRoleRepo(queries)
 	departmentRepo := repository.NewDepartmentRepo(queries)
 	categoryRepo := repository.NewCategoryRepo(queries)
+	academicYearRepo := repository.NewAcademicYearRepo(queries)
 	gmail := mail.NewGmailSender(os.Getenv("EMAIL_SENDER_NAME"), os.Getenv("EMAIL_SENDER_ADDRESS"), os.Getenv("EMAIL_SENDER_PASSWORD"))
 	userHandle := handle.UserHandler{
 		UserRepo:    userRepo,
@@ -72,6 +73,9 @@ func main() {
 	categoryHandler := handle.CategoryHandler{
 		CategoryRepo: categoryRepo,
 	}
+	academicYearHandler := handle.AcademicYearHandler{
+		AcademicYearRepo: academicYearRepo,
+	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 
 	e := echo.New()
@@ -80,12 +84,13 @@ func main() {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	routerSetup := router.Router{
-		Echo:              e,
-		UserHandler:       userHandle,
-		RoleHandler:       roleHandler,
-		DepartmentHandler: departmentHandler,
-		CategoryHandler:   categoryHandler,
-		AuthMiddleware:    authMiddleware,
+		Echo:                e,
+		UserHandler:         userHandle,
+		RoleHandler:         roleHandler,
+		DepartmentHandler:   departmentHandler,
+		CategoryHandler:     categoryHandler,
+		AcademicYearHandler: academicYearHandler,
+		AuthMiddleware:      authMiddleware,
 	}
 	routerSetup.SetupRouter()
 	e.Logger.Fatal(e.Start(":1313"))

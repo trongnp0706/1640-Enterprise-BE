@@ -7,12 +7,13 @@ import (
 )
 
 type Router struct {
-	Echo              *echo.Echo
-	UserHandler       http.UserHandler
-	RoleHandler       http.RoleHandler
-	DepartmentHandler http.DepartmentHandler
-	CategoryHandler   http.CategoryHandler
-	AuthMiddleware    *mdw.AuthMiddleware
+	Echo                *echo.Echo
+	UserHandler         http.UserHandler
+	RoleHandler         http.RoleHandler
+	DepartmentHandler   http.DepartmentHandler
+	CategoryHandler     http.CategoryHandler
+	AcademicYearHandler http.AcademicYearHandler
+	AuthMiddleware      *mdw.AuthMiddleware
 }
 
 func (r *Router) SetupRouter() {
@@ -54,4 +55,10 @@ func (r *Router) SetupRouter() {
 	category.GET("/all", r.CategoryHandler.GetAllCategories, r.AuthMiddleware.Authorize())
 	category.PATCH("/update", r.CategoryHandler.UpdateCategory, r.AuthMiddleware.Authorize())
 	category.DELETE("/delete", r.CategoryHandler.DeleteCategory, r.AuthMiddleware.Authorize())
+
+	academicYear := r.Echo.Group("/year")
+	academicYear.POST("/add", r.AcademicYearHandler.CreateAcademicYear, r.AuthMiddleware.Authorize())
+	academicYear.GET("/all", r.AcademicYearHandler.GetAllAcademicYears, r.AuthMiddleware.Authorize())
+	academicYear.PATCH("/update", r.AcademicYearHandler.UpdateAcademicYear, r.AuthMiddleware.Authorize())
+	academicYear.DELETE("/delete", r.AcademicYearHandler.DeleteAcademicYear, r.AuthMiddleware.Authorize())
 }

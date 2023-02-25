@@ -79,7 +79,7 @@ func (d *DepartmentRepo) DeleteDepartment(ctx context.Context, ticker string) (e
 	departments, err := d.sql.DeleteDepartment(ctx, ticker)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errors.New("ticker not found"), entity.Department{}
+			return errors.New("id not found"), entity.Department{}
 		}
 		return err, entity.Department{}
 	}

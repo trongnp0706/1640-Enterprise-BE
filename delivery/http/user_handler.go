@@ -243,7 +243,7 @@ func (u UserHandler) Login(c echo.Context) error {
 			})
 		}
 		// gen token
-		token, token_payload, err := security.Gentoken(user)
+		token, token_payload, err := security.GenToken(user)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, Response{
 				StatusCode: http.StatusInternalServerError,
@@ -296,7 +296,7 @@ func (u UserHandler) Login(c echo.Context) error {
 		})
 	}
 
-	token, token_payload, err := security.Gentoken(user)
+	token, token_payload, err := security.GenToken(user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
 			StatusCode: http.StatusInternalServerError,
@@ -417,7 +417,7 @@ func (u *UserHandler) RenewAccessToken(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	accessToken, _, err := security.Gentoken(sql.User{
+	accessToken, _, err := security.GenToken(sql.User{
 		ID:    refresh_payload.UserId,
 		Email: refresh_payload.Email,
 	})

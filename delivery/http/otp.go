@@ -1,11 +1,11 @@
 package http
 
 import (
-	"github.com/labstack/echo/v4"
-	"net/http"
 	"GDN-delivery-management/otp"
-)
+	"net/http"
 
+	"github.com/labstack/echo/v4"
+)
 
 type VerifyOTP struct {
 	phone string `json:"phone"`

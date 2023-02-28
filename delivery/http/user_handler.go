@@ -53,7 +53,7 @@ func (u *UserHandler) AddUser(c echo.Context) error {
 		})
 	}
 	req.ID = userId.String()
-	param := sql.CreatUserParams{
+	param := sql.CreateUserParams{
 		ID:           req.ID,
 		Email:        req.Email,
 		Username:     req.Username,
@@ -128,7 +128,7 @@ func (u *UserHandler) SystemAdminSignUp(c echo.Context) error {
 		})
 	}
 	req.ID = userId.String()
-	param := sql.CreatUserParams{
+	param := sql.CreateUserParams{
 		ID:           req.ID,
 		Email:        req.Email,
 		Username:     req.Username,

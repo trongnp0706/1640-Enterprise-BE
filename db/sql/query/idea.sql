@@ -21,11 +21,6 @@ INSERT INTO ideas(
 )
 RETURNING *;
 
---name: GetNumberOfAllIdeas :one
-SELECT COUNT(*) 
-FROM ideas;
-
-
 -- name: GetMostPopularIdeas :many
 Select * FROM ideas ORDER BY upvote_count DESC
 LIMIT $1
@@ -40,6 +35,10 @@ OFFSET $2;
 Select * FROM ideas ORDER BY created_at DESC
 LIMIT $1
 OFFSET $2;
+
+-- name: GetNumberOfAllIdeas :one
+SELECT COUNT(*) 
+FROM ideas;
 
 -- name: GetNumberOfIdeasByDepartment :one
 SELECT COUNT(*) 
@@ -79,4 +78,3 @@ DELETE FROM ideas
 WHERE id = $1
     RETURNING *;
 
--- name: 

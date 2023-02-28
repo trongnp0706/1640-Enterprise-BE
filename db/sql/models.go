@@ -73,3 +73,10 @@ type User struct {
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
 }
+
+type Vote struct {
+	ID     string `json:"id"`
+	UserID string `json:"user_id"`
+	IdeaID string `json:"idea_id"`
+	Vote   bool   `json:"vote"`
+}

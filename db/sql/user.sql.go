@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const creatUser = `-- name: CreatUser :one
+const createUser = `-- name: CreateUser :one
 INSERT INTO users(
     id, username, email, password, role_ticker, department_id
 ) VALUES (
@@ -18,7 +18,7 @@ INSERT INTO users(
 RETURNING id, username, email, password, role_ticker, department_id
 `
 
-type CreatUserParams struct {
+type CreateUserParams struct {
 	ID           string `json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
@@ -27,8 +27,8 @@ type CreatUserParams struct {
 	DepartmentID string `json:"department_id"`
 }
 
-func (q *Queries) CreatUser(ctx context.Context, arg CreatUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, creatUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser,
 		arg.ID,
 		arg.Username,
 		arg.Email,

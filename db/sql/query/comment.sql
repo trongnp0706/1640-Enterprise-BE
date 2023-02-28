@@ -25,11 +25,9 @@ OFFSET $2;
 
 -- name: UpdateComment :one
 UPDATE comments
-SET  title = $1,
-    content = $2,
-    is_anonymous = $3,
-    academic_year = $4
-WHERe id = $5
+SET content = $1,
+    is_anonymous = $2
+WHERe id = $3
     RETURNING *;
 
 -- name: DeleteComment :one

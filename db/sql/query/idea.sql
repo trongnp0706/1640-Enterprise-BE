@@ -69,8 +69,9 @@ SET  title = $1,
     document_array = $3,
     image_array = $4,
     is_anonymous = $5,
-    academic_year =  $6
-WHERE id = $7
+    academic_year = $6,
+    category_id = $7
+WHERE id = $8
     RETURNING *;
 
 -- name: DeleteIdea :one

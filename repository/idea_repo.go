@@ -12,7 +12,7 @@ import (
 )
 
 type IIdeaRepo interface {
-	AddIdea(ctx context.Context, imput entity.CreateIdeaParams) (error, entity.Idea)
+	AddIdea(ctx context.Context, input entity.CreateIdeaParams) (error, entity.Idea)
 	GetNumberOfAllIdeas(ctx context.Context) (error, int64)
 	GetIdeaByCategory(ctx context.Context, input entity.GetIdeaByCategoryParams) (error, []entity.Idea)
 	GetNumberOfIdeasByDepartment(ctx context.Context, department_id string) (error, int64)
@@ -35,8 +35,8 @@ func NewIdeaRepo(sql *entity.Queries) IIdeaRepo {
 	}
 }
 
-func (i *IdeaRepo) AddIdea(ctx context.Context, imput entity.CreateIdeaParams) (error, entity.Idea) {
-	idea, err := i.sql.CreateIdea(ctx, imput)
+func (i *IdeaRepo) AddIdea(ctx context.Context, input entity.CreateIdeaParams) (error, entity.Idea) {
+	idea, err := i.sql.CreateIdea(ctx, input)
 	if err != nil {
 		if err, ok := err.(*pq.Error); ok {
 			if err.Code.Name() == "unique_violation" {
@@ -60,8 +60,8 @@ func (i *IdeaRepo) GetNumberOfAllIdeas(ctx context.Context) (error, int64) {
 	return nil, number
 }
 
-func (i *IdeaRepo)  GetNumberOfIdeasByDepartment(ctx context.Context, department_id string) (error, int64) {
-	number, err := i.sql. GetNumberOfIdeasByDepartment(ctx, department_id)
+func (i *IdeaRepo) GetNumberOfIdeasByDepartment(ctx context.Context, department_id string) (error, int64) {
+	number, err := i.sql.GetNumberOfIdeasByDepartment(ctx, department_id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("idea not found"), number
@@ -106,8 +106,8 @@ func (i *IdeaRepo) GetIdeaByAcademicyear(ctx context.Context, input entity.GetId
 	return nil, idea
 }
 
-func (u *IdeaRepo) GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.Idea) {
-	items, err := u.sql.GetMostPopularIdeas(ctx, input)
+func (i *IdeaRepo) GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.Idea) {
+	items, err := i.sql.GetMostPopularIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return errors.New("Cannot get all ideas"), []entity.Idea{}
@@ -115,8 +115,8 @@ func (u *IdeaRepo) GetMostPopularIdeas(ctx context.Context, input entity.GetMost
 	return nil, items
 }
 
-func (u *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.Idea) {
-	items, err := u.sql.GetMostViewedIdeas(ctx, input)
+func (i *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.Idea) {
+	items, err := i.sql.GetMostViewedIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return errors.New("Cannot get all ideas"), []entity.Idea{}
@@ -124,9 +124,8 @@ func (u *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostV
 	return nil, items
 }
 
-
-func (u *IdeaRepo) GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.Idea) {
-	items, err := u.sql.GetLatestIdeas(ctx, input)
+func (i *IdeaRepo) GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.Idea) {
+	items, err := i.sql.GetLatestIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
 		return errors.New("Cannot get all ideas"), []entity.Idea{}
@@ -134,8 +133,8 @@ func (u *IdeaRepo) GetLatestIdeas(ctx context.Context, input entity.GetLatestIde
 	return nil, items
 }
 
-func (u *IdeaRepo) UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams) (error, entity.Idea) {
-	idea, err := u.sql.UpdateIdea(ctx, input)
+func (i *IdeaRepo) UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams) (error, entity.Idea) {
+	idea, err := i.sql.UpdateIdea(ctx, input)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("idea not found"), entity.Idea{}
@@ -145,8 +144,8 @@ func (u *IdeaRepo) UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams
 	return nil, idea
 }
 
-func (u *IdeaRepo) DeleteIdea(ctx context.Context, id string) (error, entity.Idea) {
-	idea, err := u.sql.DeleteIdea(ctx, id)
+func (i *IdeaRepo) DeleteIdea(ctx context.Context, id string) (error, entity.Idea) {
+	idea, err := i.sql.DeleteIdea(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("idea not found"), entity.Idea{}

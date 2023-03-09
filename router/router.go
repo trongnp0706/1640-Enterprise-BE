@@ -10,6 +10,7 @@ type Router struct {
 	Echo                *echo.Echo
 	UserHandler         http.UserHandler
 	RoleHandler         http.RoleHandler
+	IdeaHandler         http.IdeaHandler
 	DepartmentHandler   http.DepartmentHandler
 	CategoryHandler     http.CategoryHandler
 	AcademicYearHandler http.AcademicYearHandler
@@ -61,4 +62,15 @@ func (r *Router) SetupRouter() {
 	academicYear.GET("/all", r.AcademicYearHandler.GetAllAcademicYears, r.AuthMiddleware.Authorize())
 	academicYear.PATCH("/update", r.AcademicYearHandler.UpdateAcademicYear, r.AuthMiddleware.Authorize())
 	academicYear.DELETE("/delete", r.AcademicYearHandler.DeleteAcademicYear, r.AuthMiddleware.Authorize())
+
+	idea := r.Echo.Group("/idea")
+	idea.POST("/add", r.IdeaHandler.AddIdea, r.AuthMiddleware.Authorize())
+	idea.GET("/popular", r.IdeaHandler.GetMostPopularIdeas, r.AuthMiddleware.Authorize())
+	idea.GET("/most-viewed", r.IdeaHandler.GetMostViewedIdeas, r.AuthMiddleware.Authorize())
+	idea.GET("/latest", r.IdeaHandler.GetLatestIdeas, r.AuthMiddleware.Authorize())
+	idea.GET("/by-category", r.IdeaHandler.GetIdeaByCategory, r.AuthMiddleware.Authorize())
+	idea.GET("/by-year", r.IdeaHandler.GetIdeaByAcademicyear, r.AuthMiddleware.Authorize())
+	idea.PATCH("/update", r.IdeaHandler.UpdateIdea, r.AuthMiddleware.Authorize())
+	idea.DELETE("/delete", r.IdeaHandler.DeleteIdea, r.AuthMiddleware.Authorize())
+
 }

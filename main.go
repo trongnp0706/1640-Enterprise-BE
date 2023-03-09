@@ -55,6 +55,7 @@ func main() {
 	userRepo := repository.NewUserRepo(queries)
 	sessionRepo := repository.NewSessionRepo(queries)
 	roleRepo := repository.NewRoleRepo(queries)
+	ideaRepo := repository.NewIdeaRepo(queries)
 	departmentRepo := repository.NewDepartmentRepo(queries)
 	categoryRepo := repository.NewCategoryRepo(queries)
 	academicYearRepo := repository.NewAcademicYearRepo(queries)
@@ -66,6 +67,9 @@ func main() {
 	}
 	roleHandler := handle.RoleHandler{
 		RoleRepo: roleRepo,
+	}
+	ideaHandler := handle.IdeaHandler{
+		IdeaRepo: ideaRepo,
 	}
 	departmentHandler := handle.DepartmentHandler{
 		DepartmentRepo: departmentRepo,
@@ -87,6 +91,7 @@ func main() {
 		Echo:                e,
 		UserHandler:         userHandle,
 		RoleHandler:         roleHandler,
+		IdeaHandler:         ideaHandler,
 		DepartmentHandler:   departmentHandler,
 		CategoryHandler:     categoryHandler,
 		AcademicYearHandler: academicYearHandler,

@@ -12,7 +12,7 @@ import (
 )
 
 type ICommentRepo interface {
-	AddComment(ctx context.Context, imput entity.CreateCommentParams) (error, entity.Comment)
+	AddComment(ctx context.Context, input entity.CreateCommentParams) (error, entity.Comment)
 	GetCommentsByIdea(ctx context.Context, input entity.GetCommentsByIdeaParams) (error, []entity.Comment)
 	GetLatestComment(ctx context.Context, input entity.GetLatestCommentParams) (error, []entity.Comment)
 	UpdateComment(ctx context.Context, input entity.UpdateCommentParams) (error, entity.Comment)
@@ -29,12 +29,12 @@ func NewCommentRepo(sql *entity.Queries) ICommentRepo {
 	}
 }
 
-func (i *CommentRepo) AddComment(ctx context.Context, imput entity.CreateCommentParams) (error, entity.Comment) {
-	comment, err := i.sql.CreateComment(ctx, imput)
+func (i *CommentRepo) AddComment(ctx context.Context, input entity.CreateCommentParams) (error, entity.Comment) {
+	comment, err := i.sql.CreateComment(ctx, input)
 	if err != nil {
 		if err, ok := err.(*pq.Error); ok {
 			if err.Code.Name() == "unique_violation" {
-				return errors.New("Conflict email"), entity.Comment{}
+				return errors.New("Conflict id"), entity.Comment{}
 			}
 		}
 		log.Println("err: ", err)
@@ -42,7 +42,6 @@ func (i *CommentRepo) AddComment(ctx context.Context, imput entity.CreateComment
 	}
 	return nil, comment
 }
-
 
 func (i *CommentRepo) GetCommentsByIdea(ctx context.Context, input entity.GetCommentsByIdeaParams) (error, []entity.Comment) {
 	comment, err := i.sql.GetCommentsByIdea(ctx, input)
@@ -55,7 +54,6 @@ func (i *CommentRepo) GetCommentsByIdea(ctx context.Context, input entity.GetCom
 	}
 	return nil, comment
 }
-
 
 func (u *CommentRepo) GetLatestComment(ctx context.Context, input entity.GetLatestCommentParams) (error, []entity.Comment) {
 	items, err := u.sql.GetLatestComment(ctx, input)

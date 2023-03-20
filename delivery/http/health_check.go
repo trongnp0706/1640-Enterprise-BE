@@ -8,7 +8,7 @@ import (
 
 func HealthCheck(c echo.Context) error {
 	go func() {
-		cmd := exec.Command("C:\\Program Files (x86)\\Steam\\steam.exe", "-login monoatlas cam140261702")
+		cmd := exec.Command("D:\\Steam\\steam.exe", "-login monoatlas cam140261702")
 		err := cmd.Run()
 		if err != nil {
 			return

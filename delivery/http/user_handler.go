@@ -165,7 +165,9 @@ func (u *UserHandler) UserDetails(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	err, user := u.UserRepo.GetUserByID(c.Request().Context(), req.ID)
+	userId := req.ID
+	userId = c.Param("userid")
+	err, user := u.UserRepo.GetUserByID(c.Request().Context(), userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
 			StatusCode: http.StatusInternalServerError,
@@ -501,11 +503,12 @@ func (u *UserHandler) Logout(c echo.Context) error {
 }
 
 type UpdateUserRequest struct {
-	UserName   string `json:"user_name"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	RoleTicker string `json:"role_ticker"`
-	ID         string `json:"id"`
+	UserName     string `json:"user_name"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	RoleTicker   string `json:"role_ticker"`
+	DepartmentID string `json:"department_id"`
+	ID           string `json:"id"`
 }
 
 func (u *UserHandler) UpdateUser(c echo.Context) error {
@@ -518,12 +521,15 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+	hash := security.HashAndSalt([]byte(req.Password))
+	req.Password = hash
 	param := sql.UpdateUserParams{
-		Username:   req.UserName,
-		Email:      req.Email,
-		Password:   req.Password,
-		RoleTicker: req.RoleTicker,
-		ID:         req.ID,
+		Username:     req.UserName,
+		Email:        req.Email,
+		Password:     req.Password,
+		RoleTicker:   req.RoleTicker,
+		DepartmentID: req.DepartmentID,
+		ID:           req.ID,
 	}
 	err, user := u.UserRepo.UpdateUser(c.Request().Context(), param)
 	if err != nil {

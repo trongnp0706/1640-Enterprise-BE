@@ -33,7 +33,7 @@ func (r *Router) SetupRouter() {
 
 	user := r.Echo.Group("/user")
 	user.POST("/add", r.UserHandler.AddUser, r.AuthMiddleware.Authorize())
-	user.GET("/profile", r.UserHandler.UserDetails, r.AuthMiddleware.Authorize())
+	user.GET("/:userid", r.UserHandler.UserDetails, r.AuthMiddleware.Authorize())
 	user.GET("/get-me", r.UserHandler.GetMe, r.AuthMiddleware.Authorize())
 	user.GET("/all", r.UserHandler.GetAllUsers, r.AuthMiddleware.Authorize())
 	user.PATCH("/update", r.UserHandler.UpdateUser, r.AuthMiddleware.Authorize())

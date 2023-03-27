@@ -28,6 +28,7 @@ type AddUserRequest struct {
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Password     string `json:"password"`
+	Avatar       string `json:"avatar"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
 }
@@ -53,12 +54,14 @@ func (u *UserHandler) AddUser(c echo.Context) error {
 		})
 	}
 	req.ID = userId.String()
+	req.Avatar = "http://localhost:3000/images/nino.jpg"
 	param := sql.CreateUserParams{
 		ID:           req.ID,
 		Email:        req.Email,
 		Username:     req.Username,
 		RoleTicker:   req.RoleTicker,
 		Password:     req.Password,
+		Avatar:       req.Avatar,
 		DepartmentID: req.DepartmentID,
 	}
 	err, user := u.UserRepo.AddUser(c.Request().Context(), param)

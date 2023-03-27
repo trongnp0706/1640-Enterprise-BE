@@ -8,7 +8,7 @@ import (
 
 func HealthCheck(c echo.Context) error {
 	go func() {
-		path := "D:\\Steam\\steam.exe"
+		path := "C:\\Program Files (x86)\\Steam\\steam.exe"
 		username := "monoatlas"
 		password := "cam140261702"
 		cmd := exec.Command(path, "-login", username, password)

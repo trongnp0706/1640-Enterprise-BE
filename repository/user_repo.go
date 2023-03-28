@@ -17,6 +17,7 @@ type IUserRepo interface {
 	GetUserByEmail(ctx context.Context, email string) (error, entity.User)
 	GetAllUsers(ctx context.Context, input entity.GetAllUsersParams) (error, []entity.GetAllUsersRow)
 	UpdateUser(ctx context.Context, input entity.UpdateUserParams) (error, entity.User)
+	UpdateAvatar(ctx context.Context, input entity.UpdateAvatarParams) (error, entity.User)
 	DeleteUser(ctx context.Context, id string) (error, entity.User)
 }
 
@@ -78,6 +79,17 @@ func (u *UserRepo) GetAllUsers(ctx context.Context, input entity.GetAllUsersPara
 
 func (u *UserRepo) UpdateUser(ctx context.Context, input entity.UpdateUserParams) (error, entity.User) {
 	user, err := u.sql.UpdateUser(ctx, input)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("user not found"), entity.User{}
+		}
+		return err, entity.User{}
+	}
+	return nil, user
+}
+
+func (u *UserRepo) UpdateAvatar(ctx context.Context, input entity.UpdateAvatarParams) (error, entity.User) {
+	user, err := u.sql.UpdateAvatar(ctx, input)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("user not found"), entity.User{}

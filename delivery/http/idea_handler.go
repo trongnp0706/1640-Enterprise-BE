@@ -3,13 +3,10 @@ package http
 import (
 	sql "GDN-delivery-management/db/sql"
 	repo "GDN-delivery-management/repository"
-	"GDN-delivery-management/security"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -52,40 +49,6 @@ func (i *IdeaHandler) AddIdea(c echo.Context) error {
 		})
 	}
 	req.ID = ideaId.String()
-
-	header := c.Request().Header
-	auth := header.Get("Authorization")
-
-	// Get bearer token
-	if !strings.HasPrefix(strings.ToLower(auth), "bearer") {
-		fmt.Println("no token")
-		return c.JSON(http.StatusUnauthorized, Response{
-			StatusCode: http.StatusUnauthorized,
-			Message:    "token is not provided",
-			Data:       nil,
-		})
-	}
-
-	values := strings.Split(auth, " ")
-	if len(values) < 2 {
-		fmt.Println("no token")
-		return c.JSON(http.StatusUnauthorized, Response{
-			StatusCode: http.StatusUnauthorized,
-			Message:    "token is not provided",
-			Data:       nil,
-		})
-	}
-
-	token := values[1]
-	claim, err := security.VerifyToken(token)
-	if err != nil {
-		return c.JSON(http.StatusUnauthorized, Response{
-			StatusCode: http.StatusUnauthorized,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-	req.UserID = claim.UserId
 
 	param := sql.CreateIdeaParams{
 		ID:            req.ID,

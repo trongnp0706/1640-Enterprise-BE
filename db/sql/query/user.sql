@@ -23,6 +23,12 @@ SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = 
 WHERE id = $6
 RETURNING *;
 
+-- name: UpdateAvatar :one
+UPDATE users
+SET avatar = $1
+WHERE id = $2
+    RETURNING *;
+
 -- name: DeleteUser :one
 DELETE FROM users
 WHERE id = $1

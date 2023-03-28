@@ -44,6 +44,7 @@ func main() {
 		log.Println(err)
 		return
 	}
+
 	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
 								VALUES ('First Department', 'FDP') ON CONFLICT DO NOTHING`)
 	if err != nil {
@@ -51,6 +52,32 @@ func main() {
 		return
 	}
 
+	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '7fe8babbd1346dbbd1861e12d9c70ac42771d039ea257be82f02ad81079bbc60', 'http://localhost:3000/images/nino.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO categories (category_name, id) 
+								VALUES ('Category', 'CAT') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO academic_years (closure_date, academic_year) 
+								VALUES ('2023-03-28 10:30:00-07', '2022') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	_, err = driver.Exec(`INSERT INTO ideas (id, title, content, view_count, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174000', 'Title', 'Content', 0, NULL, 0, 0, FALSE, '123e4567-e89b-12d3-a456-426614174001', 'CAT', '2022', '2023-03-28 10:30:00-07') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	queries := db.New(driver)
 	userRepo := repository.NewUserRepo(queries)
 	sessionRepo := repository.NewSessionRepo(queries)

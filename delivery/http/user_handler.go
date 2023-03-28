@@ -659,3 +659,37 @@ func (u UserHandler) CheckAdmin(c echo.Context) error {
 		Data:       false,
 	})
 }
+
+type UpdateAvatarRequest struct {
+	Avatar string `json:"avatar"`
+	ID     string `json:"id"`
+}
+
+func (u *UserHandler) UpdateAvatar(c echo.Context) error {
+	req := UpdateAvatarRequest{}
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	param := sql.UpdateAvatarParams{
+		Avatar: req.Avatar,
+		ID:     req.ID,
+	}
+	err, user := u.UserRepo.UpdateAvatar(c.Request().Context(), param)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    "Success",
+		Data:       user,
+	})
+}

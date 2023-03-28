@@ -162,11 +162,38 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
 	return i, err
 }
 
+const updateAvatar = `-- name: UpdateAvatar :one
+UPDATE users
+SET avatar = $1
+WHERE id = $2
+    RETURNING id, username, email, password, avatar, role_ticker, department_id
+`
+
+type UpdateAvatarParams struct {
+	Avatar string `json:"avatar"`
+	ID     string `json:"id"`
+}
+
+func (q *Queries) UpdateAvatar(ctx context.Context, arg UpdateAvatarParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateAvatar, arg.Avatar, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.Avatar,
+		&i.RoleTicker,
+		&i.DepartmentID,
+	)
+	return i, err
+}
+
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5
 WHERE id = $6
-RETURNING id, username, email, password, role_ticker, department_id
+RETURNING id, username, email, password, avatar, role_ticker, department_id
 `
 
 type UpdateUserParams struct {
@@ -193,6 +220,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)

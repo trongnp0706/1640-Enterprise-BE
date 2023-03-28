@@ -5,7 +5,7 @@ CREATE TABLE "ideas" (
                          "content" varchar NOT NULL,
                          "view_count" integer NOT NULL,
                          "document_array" varchar,
-                         "image_array" varchar,
+                         "image_array" varchar[],
                          "upvote_count" integer NOT NULL,
                          "downvote_count" integer NOT NULL,
                          "is_anonymous" BOOLEAN NOT NULL,

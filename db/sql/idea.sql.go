@@ -9,6 +9,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 const createIdea = `-- name: CreateIdea :one
@@ -29,7 +31,7 @@ INSERT INTO ideas(
 ) VALUES (
     $1,  $2,  $3,  $4, 
     CASE WHEN $5 = '' THEN 'null' ELSE $5 END, 
-    CASE WHEN $6 = '' THEN 'null' ELSE $6 END,
+    CAST($6 AS VARCHAR[]),
     $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at
@@ -41,7 +43,7 @@ type CreateIdeaParams struct {
 	Content       string      `json:"content"`
 	ViewCount     int32       `json:"view_count"`
 	Column5       interface{} `json:"column_5"`
-	Column6       interface{} `json:"column_6"`
+	Column6       []string    `json:"column_6"`
 	UpvoteCount   int32       `json:"upvote_count"`
 	DownvoteCount int32       `json:"downvote_count"`
 	IsAnonymous   bool        `json:"is_anonymous"`
@@ -58,7 +60,7 @@ func (q *Queries) CreateIdea(ctx context.Context, arg CreateIdeaParams) (Idea, e
 		arg.Content,
 		arg.ViewCount,
 		arg.Column5,
-		arg.Column6,
+		pq.Array(arg.Column6),
 		arg.UpvoteCount,
 		arg.DownvoteCount,
 		arg.IsAnonymous,
@@ -74,7 +76,7 @@ func (q *Queries) CreateIdea(ctx context.Context, arg CreateIdeaParams) (Idea, e
 		&i.Content,
 		&i.ViewCount,
 		&i.DocumentArray,
-		&i.ImageArray,
+		pq.Array(&i.ImageArray),
 		&i.UpvoteCount,
 		&i.DownvoteCount,
 		&i.IsAnonymous,
@@ -101,7 +103,7 @@ func (q *Queries) DeleteIdea(ctx context.Context, id string) (Idea, error) {
 		&i.Content,
 		&i.ViewCount,
 		&i.DocumentArray,
-		&i.ImageArray,
+		pq.Array(&i.ImageArray),
 		&i.UpvoteCount,
 		&i.DownvoteCount,
 		&i.IsAnonymous,
@@ -126,7 +128,7 @@ func (q *Queries) GetIdea(ctx context.Context, id string) (Idea, error) {
 		&i.Content,
 		&i.ViewCount,
 		&i.DocumentArray,
-		&i.ImageArray,
+		pq.Array(&i.ImageArray),
 		&i.UpvoteCount,
 		&i.DownvoteCount,
 		&i.IsAnonymous,
@@ -165,7 +167,7 @@ func (q *Queries) GetIdeaByAcademicyear(ctx context.Context, arg GetIdeaByAcadem
 			&i.Content,
 			&i.ViewCount,
 			&i.DocumentArray,
-			&i.ImageArray,
+			pq.Array(&i.ImageArray),
 			&i.UpvoteCount,
 			&i.DownvoteCount,
 			&i.IsAnonymous,
@@ -214,7 +216,7 @@ func (q *Queries) GetIdeaByCategory(ctx context.Context, arg GetIdeaByCategoryPa
 			&i.Content,
 			&i.ViewCount,
 			&i.DocumentArray,
-			&i.ImageArray,
+			pq.Array(&i.ImageArray),
 			&i.UpvoteCount,
 			&i.DownvoteCount,
 			&i.IsAnonymous,
@@ -255,7 +257,7 @@ type GetLatestIdeasRow struct {
 	Content       string         `json:"content"`
 	ViewCount     int32          `json:"view_count"`
 	DocumentArray sql.NullString `json:"document_array"`
-	ImageArray    sql.NullString `json:"image_array"`
+	ImageArray    []string       `json:"image_array"`
 	UpvoteCount   int32          `json:"upvote_count"`
 	DownvoteCount int32          `json:"downvote_count"`
 	IsAnonymous   bool           `json:"is_anonymous"`
@@ -282,7 +284,7 @@ func (q *Queries) GetLatestIdeas(ctx context.Context, arg GetLatestIdeasParams) 
 			&i.Content,
 			&i.ViewCount,
 			&i.DocumentArray,
-			&i.ImageArray,
+			pq.Array(&i.ImageArray),
 			&i.UpvoteCount,
 			&i.DownvoteCount,
 			&i.IsAnonymous,
@@ -332,7 +334,7 @@ func (q *Queries) GetMostPopularIdeas(ctx context.Context, arg GetMostPopularIde
 			&i.Content,
 			&i.ViewCount,
 			&i.DocumentArray,
-			&i.ImageArray,
+			pq.Array(&i.ImageArray),
 			&i.UpvoteCount,
 			&i.DownvoteCount,
 			&i.IsAnonymous,
@@ -380,7 +382,7 @@ func (q *Queries) GetMostViewedIdeas(ctx context.Context, arg GetMostViewedIdeas
 			&i.Content,
 			&i.ViewCount,
 			&i.DocumentArray,
-			&i.ImageArray,
+			pq.Array(&i.ImageArray),
 			&i.UpvoteCount,
 			&i.DownvoteCount,
 			&i.IsAnonymous,
@@ -447,8 +449,8 @@ WHERE id = $8
 type UpdateIdeaParams struct {
 	Title         string         `json:"title"`
 	Content       string         `json:"content"`
-	DocumentArray string   		 `json:"document_array"`
-	ImageArray    string 		 `json:"image_array"`
+	DocumentArray string `json:"document_array"`
+	ImageArray    []string       `json:"image_array"`
 	IsAnonymous   bool           `json:"is_anonymous"`
 	AcademicYear  string         `json:"academic_year"`
 	CategoryID    string         `json:"category_id"`
@@ -460,7 +462,7 @@ func (q *Queries) UpdateIdea(ctx context.Context, arg UpdateIdeaParams) (Idea, e
 		arg.Title,
 		arg.Content,
 		arg.DocumentArray,
-		arg.ImageArray,
+		pq.Array(arg.ImageArray),
 		arg.IsAnonymous,
 		arg.AcademicYear,
 		arg.CategoryID,
@@ -473,7 +475,7 @@ func (q *Queries) UpdateIdea(ctx context.Context, arg UpdateIdeaParams) (Idea, e
 		&i.Content,
 		&i.ViewCount,
 		&i.DocumentArray,
-		&i.ImageArray,
+		pq.Array(&i.ImageArray),
 		&i.UpvoteCount,
 		&i.DownvoteCount,
 		&i.IsAnonymous,

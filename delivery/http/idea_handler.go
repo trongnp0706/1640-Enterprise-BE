@@ -20,7 +20,7 @@ type CreateIdeaRequest struct {
 	Content       string    `json:"content"`
 	ViewCount     int32     `json:"view_count"`
 	DocumentArray string    `json:"document_array"`
-	ImageArray    string    `json:"image_array"`
+	ImageArray    []string  `json:"image_array"`
 	UpvoteCount   int32     `json:"upvote_count"`
 	DownvoteCount int32     `json:"downvote_count"`
 	IsAnonymous   bool      `json:"is_anonymous"`
@@ -73,6 +73,7 @@ func (i *IdeaHandler) AddIdea(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    "Success",
@@ -263,14 +264,14 @@ func (i *IdeaHandler) GetIdeaByAcademicyear(c echo.Context) error {
 }
 
 type UpdateIdeaRequest struct {
-	Title         string `json:"title"`
-	Content       string `json:"content"`
-	DocumentArray string `json:"document_array"`
-	ImageArray    string `json:"image_array"`
-	IsAnonymous   bool   `json:"is_anonymous"`
-	AcademicYear  string `json:"academic_year"`
-	CategoryID    string `json:"category_id"`
-	ID            string `json:"id"`
+	Title         string   `json:"title"`
+	Content       string   `json:"content"`
+	DocumentArray string   `json:"document_array"`
+	ImageArray    []string `json:"image_array"`
+	IsAnonymous   bool     `json:"is_anonymous"`
+	AcademicYear  string   `json:"academic_year"`
+	CategoryID    string   `json:"category_id"`
+	ID            string   `json:"id"`
 }
 
 func (i *IdeaHandler) UpdateIdea(c echo.Context) error {

@@ -29,6 +29,8 @@ func (r *Router) SetupRouter() {
 	r.Echo.GET("/logout", r.UserHandler.Logout)
 	r.Echo.POST("otp/verify", r.UserHandler.VerifyOTP)
 
+	r.Echo.POST("/upload", http.UploadImage)
+
 	// r.Echo.POST("/token/refresh-token", r.UserHandler.RenewAccessToken, r.AuthMiddleware.UserCors())
 
 	user := r.Echo.Group("/user")

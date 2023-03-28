@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -236,9 +237,11 @@ func (q *Queries) GetIdeaByCategory(ctx context.Context, arg GetIdeaByCategoryPa
 }
 
 const getLatestIdeas = `-- name: GetLatestIdeas :many
-Select id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at FROM ideas ORDER BY created_at DESC
-LIMIT $1
-OFFSET $2
+SELECT ideas.id, ideas.title, ideas.content, ideas.view_count, ideas.document_array, ideas.image_array, ideas.upvote_count, ideas.downvote_count, ideas.is_anonymous, ideas.user_id, ideas.category_id, ideas.academic_year, ideas.created_at, users.avatar, users.username
+FROM ideas
+         INNER JOIN users ON ideas.user_id = users.id
+ORDER BY ideas.created_at DESC
+    LIMIT $1 OFFSET $2
 `
 
 type GetLatestIdeasParams struct {
@@ -246,15 +249,33 @@ type GetLatestIdeasParams struct {
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) GetLatestIdeas(ctx context.Context, arg GetLatestIdeasParams) ([]Idea, error) {
+type GetLatestIdeasRow struct {
+	ID            string         `json:"id"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ViewCount     int32          `json:"view_count"`
+	DocumentArray sql.NullString `json:"document_array"`
+	ImageArray    sql.NullString `json:"image_array"`
+	UpvoteCount   int32          `json:"upvote_count"`
+	DownvoteCount int32          `json:"downvote_count"`
+	IsAnonymous   bool           `json:"is_anonymous"`
+	UserID        string         `json:"user_id"`
+	CategoryID    string         `json:"category_id"`
+	AcademicYear  string         `json:"academic_year"`
+	CreatedAt     time.Time      `json:"created_at"`
+	Avatar        string         `json:"avatar"`
+	Username      string         `json:"username"`
+}
+
+func (q *Queries) GetLatestIdeas(ctx context.Context, arg GetLatestIdeasParams) ([]GetLatestIdeasRow, error) {
 	rows, err := q.db.QueryContext(ctx, getLatestIdeas, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Idea
+	var items []GetLatestIdeasRow
 	for rows.Next() {
-		var i Idea
+		var i GetLatestIdeasRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -269,6 +290,8 @@ func (q *Queries) GetLatestIdeas(ctx context.Context, arg GetLatestIdeasParams) 
 			&i.CategoryID,
 			&i.AcademicYear,
 			&i.CreatedAt,
+			&i.Avatar,
+			&i.Username,
 		); err != nil {
 			return nil, err
 		}

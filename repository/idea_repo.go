@@ -20,7 +20,7 @@ type IIdeaRepo interface {
 	GetIdea(ctx context.Context, id string) (error, entity.Idea)
 	GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.Idea)
 	GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.Idea)
-	GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.Idea)
+	GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.GetLatestIdeasRow)
 	UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams) (error, entity.Idea)
 	DeleteIdea(ctx context.Context, id string) (error, entity.Idea)
 }
@@ -124,11 +124,11 @@ func (i *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostV
 	return nil, items
 }
 
-func (i *IdeaRepo) GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.Idea) {
+func (i *IdeaRepo) GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.GetLatestIdeasRow) {
 	items, err := i.sql.GetLatestIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
-		return errors.New("Cannot get all ideas"), []entity.Idea{}
+		return errors.New("Cannot get all ideas"), []entity.GetLatestIdeasRow{}
 	}
 	return nil, items
 }

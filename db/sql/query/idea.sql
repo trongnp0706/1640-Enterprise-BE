@@ -32,9 +32,12 @@ LIMIT $1
 OFFSET $2;
 
 -- name: GetLatestIdeas :many
-Select * FROM ideas ORDER BY created_at DESC
-LIMIT $1
-OFFSET $2;
+SELECT ideas.*, users.avatar, users.username
+FROM ideas
+         INNER JOIN users ON ideas.user_id = users.id
+ORDER BY ideas.created_at DESC
+    LIMIT $1 OFFSET $2;
+
 
 -- name: GetNumberOfAllIdeas :one
 SELECT COUNT(*) 

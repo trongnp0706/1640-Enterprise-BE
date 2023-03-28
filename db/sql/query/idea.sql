@@ -16,7 +16,7 @@ INSERT INTO ideas(
 ) VALUES (
     $1,  $2,  $3,  $4, 
     CASE WHEN $5 = '' THEN 'null' ELSE $5 END, 
-    CASE WHEN $6 = '' THEN 'null' ELSE $6 END,
+    CAST($6 AS VARCHAR[]),
     $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING *;

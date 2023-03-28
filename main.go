@@ -53,7 +53,7 @@ func main() {
 	}
 
 	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
-								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '7fe8babbd1346dbbd1861e12d9c70ac42771d039ea257be82f02ad81079bbc60', 'http://localhost:3000/images/nino.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
+								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '7fe8babbd1346dbbd1861e12d9c70ac42771d039ea257be82f02ad81079bbc60', 'http://localhost:3000/images/miku.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return

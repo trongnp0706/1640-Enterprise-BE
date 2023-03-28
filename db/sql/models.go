@@ -39,7 +39,7 @@ type Idea struct {
 	Content       string         `json:"content"`
 	ViewCount     int32          `json:"view_count"`
 	DocumentArray sql.NullString `json:"document_array"`
-	ImageArray    sql.NullString `json:"image_array"`
+	ImageArray    []string       `json:"image_array"`
 	UpvoteCount   int32          `json:"upvote_count"`
 	DownvoteCount int32          `json:"downvote_count"`
 	IsAnonymous   bool           `json:"is_anonymous"`

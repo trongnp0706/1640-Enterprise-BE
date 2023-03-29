@@ -511,6 +511,7 @@ type UpdateUserRequest struct {
 	Password     string `json:"password"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
+	Avatar       string `json:"avatar"`
 	ID           string `json:"id"`
 }
 
@@ -532,6 +533,7 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 		Password:     req.Password,
 		RoleTicker:   req.RoleTicker,
 		DepartmentID: req.DepartmentID,
+		Avatar:       req.Avatar,
 		ID:           req.ID,
 	}
 	err, user := u.UserRepo.UpdateUser(c.Request().Context(), param)
@@ -657,39 +659,5 @@ func (u UserHandler) CheckAdmin(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "Success",
 		Data:       false,
-	})
-}
-
-type UpdateAvatarRequest struct {
-	Avatar string `json:"avatar"`
-	ID     string `json:"id"`
-}
-
-func (u *UserHandler) UpdateAvatar(c echo.Context) error {
-	req := UpdateAvatarRequest{}
-	err := c.Bind(&req)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-	param := sql.UpdateAvatarParams{
-		Avatar: req.Avatar,
-		ID:     req.ID,
-	}
-	err, user := u.UserRepo.UpdateAvatar(c.Request().Context(), param)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-	return c.JSON(http.StatusOK, Response{
-		StatusCode: http.StatusOK,
-		Message:    "Success",
-		Data:       user,
 	})
 }

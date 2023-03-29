@@ -19,15 +19,9 @@ OFFSET $2;
 
 -- name: UpdateUser :one
 UPDATE users
-SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5
-WHERE id = $6
+SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5, avatar = $6
+WHERE id = $7
 RETURNING *;
-
--- name: UpdateAvatar :one
-UPDATE users
-SET avatar = $1
-WHERE id = $2
-    RETURNING *;
 
 -- name: DeleteUser :one
 DELETE FROM users

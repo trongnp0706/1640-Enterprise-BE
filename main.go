@@ -66,12 +66,27 @@ func main() {
 		return
 	}
 
+	_, err = driver.Exec(`INSERT INTO categories (category_name, id) 
+								VALUES ('Dogegory', 'DOG') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	_, err = driver.Exec(`INSERT INTO academic_years (closure_date, academic_year) 
 								VALUES ('2023-03-28 10:30:00-07', '2022') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	_, err = driver.Exec(`INSERT INTO academic_years (closure_date, academic_year) 
+								VALUES ('2024-03-28 10:30:00-07', '2023') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	_, err = driver.Exec(`INSERT INTO ideas (id, title, content, view_count, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at) 
 								VALUES ('123e4567-e89b-12d3-a456-426614174000', 'Title', 'Content', 0, NULL, 0, 0, FALSE, '123e4567-e89b-12d3-a456-426614174001', 'CAT', '2022', '2023-03-28 10:30:00-07') ON CONFLICT DO NOTHING`)
 	if err != nil {

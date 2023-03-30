@@ -25,7 +25,7 @@ type CreateVoteParams struct {
 	ID     string `json:"id"`
 	UserID string `json:"user_id"`
 	IdeaID string `json:"idea_id"`
-	Vote   bool   `json:"vote"`
+	Vote   string `json:"vote"`
 }
 
 func (q *Queries) CreateVote(ctx context.Context, arg CreateVoteParams) (Vote, error) {
@@ -63,15 +63,17 @@ func (q *Queries) DeleteVote(ctx context.Context, id string) (Vote, error) {
 	return i, err
 }
 
-const updateVoteDOWN = `-- name: UpdateVoteDOWN :one
-UPDATE votes 
-SET  vote = FALSE
-WHERE id = $1
-    RETURNING id, user_id, idea_id, vote
+const getVote = `-- name: GetVote :one
+SELECT id, user_id, idea_id, vote FROM votes WHERE user_id = $1 AND idea_id = $2
 `
 
-func (q *Queries) UpdateVoteDOWN(ctx context.Context, id string) (Vote, error) {
-	row := q.db.QueryRowContext(ctx, updateVoteDOWN, id)
+type GetVoteParams struct {
+	UserID string `json:"user_id"`
+	IdeaID string `json:"idea_id"`
+}
+
+func (q *Queries) GetVote(ctx context.Context, arg GetVoteParams) (Vote, error) {
+	row := q.db.QueryRowContext(ctx, getVote, arg.UserID, arg.IdeaID)
 	var i Vote
 	err := row.Scan(
 		&i.ID,
@@ -82,15 +84,20 @@ func (q *Queries) UpdateVoteDOWN(ctx context.Context, id string) (Vote, error) {
 	return i, err
 }
 
-const updateVoteUP = `-- name: UpdateVoteUP :one
+const updateVote = `-- name: UpdateVote :one
 UPDATE votes 
-SET  vote = TRUE
-WHERE id = $1
+SET  vote = $1
+WHERE id = $2
     RETURNING id, user_id, idea_id, vote
 `
 
-func (q *Queries) UpdateVoteUP(ctx context.Context, id string) (Vote, error) {
-	row := q.db.QueryRowContext(ctx, updateVoteUP, id)
+type UpdateVoteParams struct {
+	Vote string `json:"vote"`
+	ID   string `json:"id"`
+}
+
+func (q *Queries) UpdateVote(ctx context.Context, arg UpdateVoteParams) (Vote, error) {
+	row := q.db.QueryRowContext(ctx, updateVote, arg.Vote, arg.ID)
 	var i Vote
 	err := row.Scan(
 		&i.ID,

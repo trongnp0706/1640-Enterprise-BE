@@ -102,6 +102,7 @@ func main() {
 	departmentRepo := repository.NewDepartmentRepo(queries)
 	categoryRepo := repository.NewCategoryRepo(queries)
 	academicYearRepo := repository.NewAcademicYearRepo(queries)
+	voteRepo := repository.NewVoteRepo(queries)
 	gmail := mail.NewGmailSender(os.Getenv("EMAIL_SENDER_NAME"), os.Getenv("EMAIL_SENDER_ADDRESS"), os.Getenv("EMAIL_SENDER_PASSWORD"))
 	userHandle := handle.UserHandler{
 		UserRepo:    userRepo,
@@ -126,6 +127,9 @@ func main() {
 	academicYearHandler := handle.AcademicYearHandler{
 		AcademicYearRepo: academicYearRepo,
 	}
+	voteHandler := handle.VoteHandler{
+		VoteRepo: voteRepo,
+	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 
 	e := echo.New()
@@ -143,6 +147,7 @@ func main() {
 		DepartmentHandler:   departmentHandler,
 		CategoryHandler:     categoryHandler,
 		AcademicYearHandler: academicYearHandler,
+		VoteHandler:         voteHandler,
 		AuthMiddleware:      authMiddleware,
 	}
 	routerSetup.SetupRouter()

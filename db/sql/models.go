@@ -79,5 +79,5 @@ type Vote struct {
 	ID     string `json:"id"`
 	UserID string `json:"user_id"`
 	IdeaID string `json:"idea_id"`
-	Vote   bool   `json:"vote"`
+	Vote   string `json:"vote"`
 }

@@ -3,7 +3,7 @@ CREATE TABLE "votes" (
                             "id" varchar NOT NULL PRIMARY KEY,
                             "user_id" varchar NOT NULL,
                             "idea_id" varchar NOT NULL,
-                            "vote" boolean NOT NULL
+                            "vote" varchar NOT NULL
                             
 );
 

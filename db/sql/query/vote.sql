@@ -9,16 +9,13 @@ INSERT INTO votes(
 )
 RETURNING *;
 
--- name: UpdateVoteUP :one
-UPDATE votes 
-SET  vote = TRUE
-WHERE id = $1
-    RETURNING *;
+-- name: GetVote :one
+SELECT * FROM votes WHERE user_id = $1 AND idea_id = $2;
 
--- name: UpdateVoteDOWN :one
+-- name: UpdateVote :one
 UPDATE votes 
-SET  vote = FALSE
-WHERE id = $1
+SET  vote = $1
+WHERE id = $2
     RETURNING *;
 
 -- name: DeleteVote :one

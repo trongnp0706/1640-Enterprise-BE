@@ -23,6 +23,12 @@ type IIdeaRepo interface {
 	GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.GetLatestIdeasRow)
 	UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams) (error, entity.Idea)
 	DeleteIdea(ctx context.Context, id string) (error, entity.Idea)
+	DecreaseUpvoteCount(ctx context.Context, id string) (error, entity.Idea)
+	IncreaseUpvoteCount(ctx context.Context, id string) (error, entity.Idea)
+	DecreaseDownvoteCount(ctx context.Context, id string) (error, entity.Idea)
+	IncreaseDownvoteCount(ctx context.Context, id string) (error, entity.Idea)
+	GetUpvoteCount(ctx context.Context, id string) int32
+	GetDownvoteCount(ctx context.Context, id string) int32
 }
 
 type IdeaRepo struct {
@@ -153,4 +159,58 @@ func (i *IdeaRepo) DeleteIdea(ctx context.Context, id string) (error, entity.Ide
 		return err, entity.Idea{}
 	}
 	return nil, idea
+}
+
+func (i *IdeaRepo) DecreaseUpvoteCount(ctx context.Context, id string) (error, entity.Idea) {
+	idea, err := i.sql.DecreaseUpvoteCount(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("idea not found"), entity.Idea{}
+		}
+		return err, entity.Idea{}
+	}
+	return nil, idea
+}
+
+func (i *IdeaRepo) IncreaseDownvoteCount(ctx context.Context, id string) (error, entity.Idea) {
+	idea, err := i.sql.IncreaseDownvoteCount(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("idea not found"), entity.Idea{}
+		}
+		return err, entity.Idea{}
+	}
+	return nil, idea
+}
+
+func (i *IdeaRepo) DecreaseDownvoteCount(ctx context.Context, id string) (error, entity.Idea) {
+	idea, err := i.sql.DecreaseDownvoteCount(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("idea not found"), entity.Idea{}
+		}
+		return err, entity.Idea{}
+	}
+	return nil, idea
+}
+
+func (i *IdeaRepo) IncreaseUpvoteCount(ctx context.Context, id string) (error, entity.Idea) {
+	idea, err := i.sql.IncreaseUpvoteCount(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("idea not found"), entity.Idea{}
+		}
+		return err, entity.Idea{}
+	}
+	return nil, idea
+}
+
+func (i *IdeaRepo) GetUpvoteCount(ctx context.Context, id string) int32 {
+	upvoteCount, _ := i.sql.GetUpvoteCount(ctx, id)
+	return upvoteCount
+}
+
+func (i *IdeaRepo) GetDownvoteCount(ctx context.Context, id string) int32 {
+	downvoteCount, _ := i.sql.GetDownvoteCount(ctx, id)
+	return downvoteCount
 }

@@ -11,6 +11,7 @@ type Router struct {
 	UserHandler         http.UserHandler
 	RoleHandler         http.RoleHandler
 	IdeaHandler         http.IdeaHandler
+	VoteHandler         http.VoteHandler
 	CommentHandler      http.CommentHandler
 	DepartmentHandler   http.DepartmentHandler
 	CategoryHandler     http.CategoryHandler
@@ -82,4 +83,8 @@ func (r *Router) SetupRouter() {
 	comment.GET("/latest", r.CommentHandler.GetLatestComment, r.AuthMiddleware.Authorize())
 	comment.PATCH("/update", r.CommentHandler.UpdateComment, r.AuthMiddleware.Authorize())
 	comment.DELETE("/delete", r.CommentHandler.DeleteComment, r.AuthMiddleware.Authorize())
+
+	vote := r.Echo.Group("/vote")
+	vote.POST("/handle", r.VoteHandler.HandleVote)
+	vote.POST("/get", r.VoteHandler.GetVote)
 }

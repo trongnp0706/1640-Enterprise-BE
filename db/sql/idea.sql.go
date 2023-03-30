@@ -88,6 +88,62 @@ func (q *Queries) CreateIdea(ctx context.Context, arg CreateIdeaParams) (Idea, e
 	return i, err
 }
 
+const decreaseDownvoteCount = `-- name: DecreaseDownvoteCount :one
+UPDATE ideas
+SET  downvote_count = downvote_count - 1
+WHERE id = $1
+    RETURNING id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at
+`
+
+func (q *Queries) DecreaseDownvoteCount(ctx context.Context, id string) (Idea, error) {
+	row := q.db.QueryRowContext(ctx, decreaseDownvoteCount, id)
+	var i Idea
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.ViewCount,
+		&i.DocumentArray,
+		pq.Array(&i.ImageArray),
+		&i.UpvoteCount,
+		&i.DownvoteCount,
+		&i.IsAnonymous,
+		&i.UserID,
+		&i.CategoryID,
+		&i.AcademicYear,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const decreaseUpvoteCount = `-- name: DecreaseUpvoteCount :one
+UPDATE ideas
+SET  upvote_count = upvote_count - 1
+WHERE id = $1
+    RETURNING id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at
+`
+
+func (q *Queries) DecreaseUpvoteCount(ctx context.Context, id string) (Idea, error) {
+	row := q.db.QueryRowContext(ctx, decreaseUpvoteCount, id)
+	var i Idea
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.ViewCount,
+		&i.DocumentArray,
+		pq.Array(&i.ImageArray),
+		&i.UpvoteCount,
+		&i.DownvoteCount,
+		&i.IsAnonymous,
+		&i.UserID,
+		&i.CategoryID,
+		&i.AcademicYear,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const deleteIdea = `-- name: DeleteIdea :one
 DELETE FROM ideas
 WHERE id = $1
@@ -113,6 +169,17 @@ func (q *Queries) DeleteIdea(ctx context.Context, id string) (Idea, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getDownvoteCount = `-- name: GetDownvoteCount :one
+SELECT downvote_count FROM ideas WHERE id = $1
+`
+
+func (q *Queries) GetDownvoteCount(ctx context.Context, id string) (int32, error) {
+	row := q.db.QueryRowContext(ctx, getDownvoteCount, id)
+	var downvote_count int32
+	err := row.Scan(&downvote_count)
+	return downvote_count, err
 }
 
 const getIdea = `-- name: GetIdea :one
@@ -431,6 +498,73 @@ func (q *Queries) GetNumberOfIdeasByDepartment(ctx context.Context, departmentID
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getUpvoteCount = `-- name: GetUpvoteCount :one
+SELECT upvote_count FROM ideas WHERE id = $1
+`
+
+func (q *Queries) GetUpvoteCount(ctx context.Context, id string) (int32, error) {
+	row := q.db.QueryRowContext(ctx, getUpvoteCount, id)
+	var upvote_count int32
+	err := row.Scan(&upvote_count)
+	return upvote_count, err
+}
+
+const increaseDownvoteCount = `-- name: IncreaseDownvoteCount :one
+UPDATE ideas
+SET  downvote_count = downvote_count + 1
+WHERE id = $1
+    RETURNING id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at
+`
+
+func (q *Queries) IncreaseDownvoteCount(ctx context.Context, id string) (Idea, error) {
+	row := q.db.QueryRowContext(ctx, increaseDownvoteCount, id)
+	var i Idea
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.ViewCount,
+		&i.DocumentArray,
+		pq.Array(&i.ImageArray),
+		&i.UpvoteCount,
+		&i.DownvoteCount,
+		&i.IsAnonymous,
+		&i.UserID,
+		&i.CategoryID,
+		&i.AcademicYear,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const increaseUpvoteCount = `-- name: IncreaseUpvoteCount :one
+UPDATE ideas
+SET  upvote_count = upvote_count + 1
+WHERE id = $1
+    RETURNING id, title, content, view_count, document_array, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at
+`
+
+func (q *Queries) IncreaseUpvoteCount(ctx context.Context, id string) (Idea, error) {
+	row := q.db.QueryRowContext(ctx, increaseUpvoteCount, id)
+	var i Idea
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.ViewCount,
+		&i.DocumentArray,
+		pq.Array(&i.ImageArray),
+		&i.UpvoteCount,
+		&i.DownvoteCount,
+		&i.IsAnonymous,
+		&i.UserID,
+		&i.CategoryID,
+		&i.AcademicYear,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const updateIdea = `-- name: UpdateIdea :one

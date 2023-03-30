@@ -129,6 +129,7 @@ func main() {
 	}
 	voteHandler := handle.VoteHandler{
 		VoteRepo: voteRepo,
+		IdeaRepo: ideaRepo,
 	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 

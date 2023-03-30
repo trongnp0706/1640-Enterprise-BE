@@ -81,25 +81,25 @@ WHERE id = $8
 UPDATE ideas
 SET  upvote_count = upvote_count + 1
 WHERE id = $1
-    RETURNING *;
+    RETURNING upvote_count;
 
 -- name: DecreaseUpvoteCount :one
 UPDATE ideas
 SET  upvote_count = upvote_count - 1
 WHERE id = $1
-    RETURNING *;
+    RETURNING upvote_count;
 
 -- name: IncreaseDownvoteCount :one
 UPDATE ideas
 SET  downvote_count = downvote_count + 1
 WHERE id = $1
-    RETURNING *;
+    RETURNING downvote_count;
 
 -- name: DecreaseDownvoteCount :one
 UPDATE ideas
 SET  downvote_count = downvote_count - 1
 WHERE id = $1
-    RETURNING *;
+    RETURNING downvote_count;
 
 -- name: GetUpvoteCount :one
 SELECT upvote_count FROM ideas WHERE id = $1;

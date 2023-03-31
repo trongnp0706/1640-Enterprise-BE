@@ -337,3 +337,32 @@ func (i *IdeaHandler) DeleteIdea(c echo.Context) error {
 		Data:       idea,
 	})
 }
+
+type IncreaseViewRequest struct {
+	ID string `json:"idea_id"`
+}
+
+func (i *IdeaHandler) IncreaseView(c echo.Context) error {
+	req := IncreaseViewRequest{}
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	err, view := i.IdeaRepo.IncreaseView(c.Request().Context(), req.ID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    "Success",
+		Data:       view,
+	})
+}

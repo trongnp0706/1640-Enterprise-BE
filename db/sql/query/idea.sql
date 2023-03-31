@@ -77,29 +77,11 @@ SET  title = $1,
 WHERE id = $8
     RETURNING *;
 
--- name: IncreaseUpvoteCount :one
+-- name: IncreaseView :one
 UPDATE ideas
-SET  upvote_count = upvote_count + 1
+SET  view_count = view_count + 1
 WHERE id = $1
-    RETURNING upvote_count;
-
--- name: DecreaseUpvoteCount :one
-UPDATE ideas
-SET  upvote_count = upvote_count - 1
-WHERE id = $1
-    RETURNING upvote_count;
-
--- name: IncreaseDownvoteCount :one
-UPDATE ideas
-SET  downvote_count = downvote_count + 1
-WHERE id = $1
-    RETURNING downvote_count;
-
--- name: DecreaseDownvoteCount :one
-UPDATE ideas
-SET  downvote_count = downvote_count - 1
-WHERE id = $1
-    RETURNING downvote_count;
+    RETURNING view_count;
 
 -- name: GetUpvoteCount :one
 SELECT upvote_count FROM ideas WHERE id = $1;

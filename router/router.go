@@ -75,6 +75,7 @@ func (r *Router) SetupRouter() {
 	idea.GET("/by-category", r.IdeaHandler.GetIdeaByCategory, r.AuthMiddleware.Authorize())
 	idea.GET("/by-year", r.IdeaHandler.GetIdeaByAcademicyear, r.AuthMiddleware.Authorize())
 	idea.PATCH("/update", r.IdeaHandler.UpdateIdea, r.AuthMiddleware.Authorize())
+	idea.PATCH("/view", r.IdeaHandler.IncreaseView, r.AuthMiddleware.Authorize())
 	idea.DELETE("/delete", r.IdeaHandler.DeleteIdea, r.AuthMiddleware.Authorize())
 
 	comment := r.Echo.Group("/comment")

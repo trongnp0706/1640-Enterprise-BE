@@ -515,6 +515,10 @@ type UpdateUserRequest struct {
 	ID           string `json:"id"`
 }
 
+type UserUpdateResponse struct {
+	User sql.User `json:"user"`
+}
+
 func (u *UserHandler) UpdateUser(c echo.Context) error {
 	req := UpdateUserRequest{}
 	err := c.Bind(&req)
@@ -544,10 +548,13 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+	userRes := UserUpdateResponse{
+		User: user,
+	}
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    "Success",
-		Data:       user,
+		Data:       userRes,
 	})
 }
 

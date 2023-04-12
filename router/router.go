@@ -80,8 +80,7 @@ func (r *Router) SetupRouter() {
 
 	comment := r.Echo.Group("/comment")
 	comment.POST("/add", r.CommentHandler.AddComment, r.AuthMiddleware.Authorize())
-	comment.GET("/all", r.CommentHandler.GetCommentsByIdea, r.AuthMiddleware.Authorize())
-	comment.GET("/latest", r.CommentHandler.GetLatestComment, r.AuthMiddleware.Authorize())
+	comment.POST("/all", r.CommentHandler.GetCommentsByIdea, r.AuthMiddleware.Authorize())
 	comment.PATCH("/update", r.CommentHandler.UpdateComment, r.AuthMiddleware.Authorize())
 	comment.DELETE("/delete", r.CommentHandler.DeleteComment, r.AuthMiddleware.Authorize())
 

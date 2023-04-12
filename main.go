@@ -93,6 +93,13 @@ func main() {
 		log.Println(err)
 		return
 	}
+
+	_, err = driver.Exec(`INSERT INTO comments (id, content, is_anonymous, user_id, idea_id, created_at) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174000','Content', FALSE, '123e4567-e89b-12d3-a456-426614174001', '123e4567-e89b-12d3-a456-426614174000', '2023-03-28 10:30:00-07') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	queries := db.New(driver)
 	userRepo := repository.NewUserRepo(queries)
 	sessionRepo := repository.NewSessionRepo(queries)

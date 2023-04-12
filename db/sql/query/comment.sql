@@ -12,22 +12,16 @@ INSERT INTO comments(
 RETURNING *;
 
 -- name: GetCommentsByIdea :many
-Select * FROM comments 
-WHERE idea_id = $1
-LIMIT $2
-OFFSET $3;
-
--- name: GetLatestComment :many
-Select * FROM comments 
-ORDER BY created_at DESC
-LIMIT $1
-OFFSET $2;
+Select comments.*, users.avatar, users.username
+FROM comments
+         INNER JOIN users ON comments.user_id = users.id
+WHERE idea_id = $1;
 
 -- name: UpdateComment :one
 UPDATE comments
 SET content = $1,
     is_anonymous = $2
-WHERe id = $3
+WHERE id = $3
     RETURNING *;
 
 -- name: DeleteComment :one

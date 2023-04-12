@@ -75,27 +75,32 @@ func (q *Queries) DeleteComment(ctx context.Context, id string) (Comment, error)
 }
 
 const getCommentsByIdea = `-- name: GetCommentsByIdea :many
-Select id, content, is_anonymous, user_id, idea_id, created_at FROM comments 
+Select comments.id, comments.content, comments.is_anonymous, comments.user_id, comments.idea_id, comments.created_at, users.avatar, users.username
+FROM comments
+         INNER JOIN users ON comments.user_id = users.id
 WHERE idea_id = $1
-LIMIT $2
-OFFSET $3
 `
 
-type GetCommentsByIdeaParams struct {
-	IdeaID string `json:"idea_id"`
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
+type GetCommentsByIdeaRow struct {
+	ID          string    `json:"id"`
+	Content     string    `json:"content"`
+	IsAnonymous bool      `json:"is_anonymous"`
+	UserID      string    `json:"user_id"`
+	IdeaID      string    `json:"idea_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Avatar      string    `json:"avatar"`
+	Username    string    `json:"username"`
 }
 
-func (q *Queries) GetCommentsByIdea(ctx context.Context, arg GetCommentsByIdeaParams) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, getCommentsByIdea, arg.IdeaID, arg.Limit, arg.Offset)
+func (q *Queries) GetCommentsByIdea(ctx context.Context, ideaID string) ([]GetCommentsByIdeaRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCommentsByIdea, ideaID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Comment
+	var items []GetCommentsByIdeaRow
 	for rows.Next() {
-		var i Comment
+		var i GetCommentsByIdeaRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Content,
@@ -103,48 +108,8 @@ func (q *Queries) GetCommentsByIdea(ctx context.Context, arg GetCommentsByIdeaPa
 			&i.UserID,
 			&i.IdeaID,
 			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getLatestComment = `-- name: GetLatestComment :many
-Select id, content, is_anonymous, user_id, idea_id, created_at FROM comments 
-ORDER BY created_at DESC
-LIMIT $1
-OFFSET $2
-`
-
-type GetLatestCommentParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) GetLatestComment(ctx context.Context, arg GetLatestCommentParams) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, getLatestComment, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Comment
-	for rows.Next() {
-		var i Comment
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.IsAnonymous,
-			&i.UserID,
-			&i.IdeaID,
-			&i.CreatedAt,
+			&i.Avatar,
+			&i.Username,
 		); err != nil {
 			return nil, err
 		}
@@ -163,7 +128,7 @@ const updateComment = `-- name: UpdateComment :one
 UPDATE comments
 SET content = $1,
     is_anonymous = $2
-WHERe id = $3
+WHERE id = $3
     RETURNING id, content, is_anonymous, user_id, idea_id, created_at
 `
 

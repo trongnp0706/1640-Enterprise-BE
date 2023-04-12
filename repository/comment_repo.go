@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/lib/pq"
@@ -13,8 +12,7 @@ import (
 
 type ICommentRepo interface {
 	AddComment(ctx context.Context, input entity.CreateCommentParams) (error, entity.Comment)
-	GetCommentsByIdea(ctx context.Context, input entity.GetCommentsByIdeaParams) (error, []entity.Comment)
-	GetLatestComment(ctx context.Context, input entity.GetLatestCommentParams) (error, []entity.Comment)
+	GetCommentsByIdea(ctx context.Context, ideaID string) (error, []entity.GetCommentsByIdeaRow)
 	UpdateComment(ctx context.Context, input entity.UpdateCommentParams) (error, entity.Comment)
 	DeleteComment(ctx context.Context, id string) (error, entity.Comment)
 }
@@ -43,25 +41,16 @@ func (i *CommentRepo) AddComment(ctx context.Context, input entity.CreateComment
 	return nil, comment
 }
 
-func (i *CommentRepo) GetCommentsByIdea(ctx context.Context, input entity.GetCommentsByIdeaParams) (error, []entity.Comment) {
-	comment, err := i.sql.GetCommentsByIdea(ctx, input)
+func (i *CommentRepo) GetCommentsByIdea(ctx context.Context, ideaID string) (error, []entity.GetCommentsByIdeaRow) {
+	comment, err := i.sql.GetCommentsByIdea(ctx, ideaID)
 	if err != nil {
 		log.Println("err", err)
 		if err == sql.ErrNoRows {
-			return errors.New("comment not found"), []entity.Comment{}
+			return errors.New("comment not found"), []entity.GetCommentsByIdeaRow{}
 		}
-		return err, []entity.Comment{}
+		return err, []entity.GetCommentsByIdeaRow{}
 	}
 	return nil, comment
-}
-
-func (u *CommentRepo) GetLatestComment(ctx context.Context, input entity.GetLatestCommentParams) (error, []entity.Comment) {
-	items, err := u.sql.GetLatestComment(ctx, input)
-	if err != nil {
-		fmt.Printf(err.Error())
-		return errors.New("Cannot get all comments"), []entity.Comment{}
-	}
-	return nil, items
 }
 
 func (u *CommentRepo) UpdateComment(ctx context.Context, input entity.UpdateCommentParams) (error, entity.Comment) {

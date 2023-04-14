@@ -229,40 +229,6 @@ type GetIdeaByAcademicyearRequest struct {
 	Offset       int32  `json:"offset"`
 }
 
-func (i *IdeaHandler) GetIdeaByAcademicyear(c echo.Context) error {
-	req := GetIdeaByAcademicyearRequest{}
-	err := c.Bind(&req)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	req.Limit = int32(limit)
-	req.Offset = int32(limit) * (int32(page) - 1)
-	param := sql.GetIdeaByAcademicyearParams{
-		AcademicYear: req.AcademicYear,
-		Limit:        req.Limit,
-		Offset:       req.Offset,
-	}
-	err, ideas := i.IdeaRepo.GetIdeaByAcademicyear(c.Request().Context(), param)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-	return c.JSON(http.StatusOK, Response{
-		StatusCode: http.StatusOK,
-		Message:    "Success",
-		Data:       ideas,
-	})
-}
-
 type UpdateIdeaRequest struct {
 	Title         string   `json:"title"`
 	Content       string   `json:"content"`

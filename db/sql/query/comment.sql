@@ -15,7 +15,8 @@ RETURNING *;
 Select comments.*, users.avatar, users.username
 FROM comments
          INNER JOIN users ON comments.user_id = users.id
-WHERE idea_id = $1;
+WHERE idea_id = $1
+ORDER BY comments.created_at DESC;
 
 -- name: UpdateComment :one
 UPDATE comments

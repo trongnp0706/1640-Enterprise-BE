@@ -16,10 +16,9 @@ type IIdeaRepo interface {
 	GetNumberOfAllIdeas(ctx context.Context) (error, int64)
 	GetIdeaByCategory(ctx context.Context, input entity.GetIdeaByCategoryParams) (error, []entity.Idea)
 	GetNumberOfIdeasByDepartment(ctx context.Context, department_id string) (error, int64)
-	GetIdeaByAcademicyear(ctx context.Context, input entity.GetIdeaByAcademicyearParams) (error, []entity.Idea)
 	GetIdea(ctx context.Context, id string) (error, entity.Idea)
-	GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.Idea)
-	GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.Idea)
+	GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.GetMostPopularIdeasRow)
+	GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.GetMostViewedIdeasRow)
 	GetLatestIdeas(ctx context.Context, input entity.GetLatestIdeasParams) (error, []entity.GetLatestIdeasRow)
 	UpdateIdea(ctx context.Context, input entity.UpdateIdeaParams) (error, entity.Idea)
 	DeleteIdea(ctx context.Context, id string) (error, entity.Idea)
@@ -97,32 +96,20 @@ func (i *IdeaRepo) GetIdeaByCategory(ctx context.Context, input entity.GetIdeaBy
 	return nil, idea
 }
 
-func (i *IdeaRepo) GetIdeaByAcademicyear(ctx context.Context, input entity.GetIdeaByAcademicyearParams) (error, []entity.Idea) {
-	idea, err := i.sql.GetIdeaByAcademicyear(ctx, input)
-	if err != nil {
-		log.Println("err", err)
-		if err == sql.ErrNoRows {
-			return errors.New("idea not found"), []entity.Idea{}
-		}
-		return err, []entity.Idea{}
-	}
-	return nil, idea
-}
-
-func (i *IdeaRepo) GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.Idea) {
+func (i *IdeaRepo) GetMostPopularIdeas(ctx context.Context, input entity.GetMostPopularIdeasParams) (error, []entity.GetMostPopularIdeasRow) {
 	items, err := i.sql.GetMostPopularIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
-		return errors.New("Cannot get all ideas"), []entity.Idea{}
+		return errors.New("Cannot get all ideas"), []entity.GetMostPopularIdeasRow{}
 	}
 	return nil, items
 }
 
-func (i *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.Idea) {
+func (i *IdeaRepo) GetMostViewedIdeas(ctx context.Context, input entity.GetMostViewedIdeasParams) (error, []entity.GetMostViewedIdeasRow) {
 	items, err := i.sql.GetMostViewedIdeas(ctx, input)
 	if err != nil {
 		fmt.Printf(err.Error())
-		return errors.New("Cannot get all ideas"), []entity.Idea{}
+		return errors.New("Cannot get all ideas"), []entity.GetMostViewedIdeasRow{}
 	}
 	return nil, items
 }

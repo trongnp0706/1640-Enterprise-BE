@@ -22,14 +22,18 @@ INSERT INTO ideas(
 RETURNING *;
 
 -- name: GetMostPopularIdeas :many
-Select * FROM ideas ORDER BY upvote_count DESC
-LIMIT $1
-OFFSET $2;
+SELECT ideas.*, users.avatar, users.username
+FROM ideas
+         INNER JOIN users ON ideas.user_id = users.id
+ORDER BY (ideas.upvote_count - ideas.downvote_count) DESC
+LIMIT $1 OFFSET $2;
 
 -- name: GetMostViewedIdeas :many
-Select * FROM ideas ORDER BY view_count DESC
-LIMIT $1
-OFFSET $2;
+SELECT ideas.*, users.avatar, users.username
+FROM ideas
+         INNER JOIN users ON ideas.user_id = users.id
+ORDER BY ideas.view_count DESC
+LIMIT $1 OFFSET $2;
 
 -- name: GetLatestIdeas :many
 SELECT ideas.*, users.avatar, users.username
@@ -61,9 +65,7 @@ LIMIT $2
 OFFSET $3;
 
 -- name: GetIdeaByAcademicyear :many
-SELECT * FROM ideas WHERE academic_year = $1
-LIMIT $2
-OFFSET $3;
+SELECT COUNT(*) FROM ideas WHERE academic_year = $1;
 
 -- name: UpdateIdea :one
 UPDATE ideas

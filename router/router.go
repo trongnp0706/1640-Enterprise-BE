@@ -73,7 +73,6 @@ func (r *Router) SetupRouter() {
 	idea.GET("/most-viewed", r.IdeaHandler.GetMostViewedIdeas, r.AuthMiddleware.Authorize())
 	idea.GET("/latest", r.IdeaHandler.GetLatestIdeas, r.AuthMiddleware.Authorize())
 	idea.GET("/by-category", r.IdeaHandler.GetIdeaByCategory, r.AuthMiddleware.Authorize())
-	idea.GET("/by-year", r.IdeaHandler.GetIdeaByAcademicyear, r.AuthMiddleware.Authorize())
 	idea.PATCH("/update", r.IdeaHandler.UpdateIdea, r.AuthMiddleware.Authorize())
 	idea.PATCH("/view", r.IdeaHandler.IncreaseView, r.AuthMiddleware.Authorize())
 	idea.DELETE("/delete", r.IdeaHandler.DeleteIdea, r.AuthMiddleware.Authorize())

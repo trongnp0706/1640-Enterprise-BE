@@ -38,8 +38,30 @@ func main() {
 		log.Println(err)
 		return
 	}
+
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('QA Manager', 'QAM') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('Quality Assurance Coordinator', 'QAC') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
 								VALUES ('User', 'USR') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
+								VALUES ('None', 'N/A') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return
@@ -53,7 +75,14 @@ func main() {
 	}
 
 	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
-								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '7fe8babbd1346dbbd1861e12d9c70ac42771d039ea257be82f02ad81079bbc60', 'http://localhost:3000/images/miku.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
+								VALUES ('123e4567-e89b-12d3-a456-426614174002', 'System Admin', 'admin@gmail.com', '$2a$04$vx/bEre7k.qlSeVx/DaOcefXX4BBcQJ4326drbJO3ViuhHWAjyrxG', 'http://localhost:3000/images/nino.jpg', 'SAD', 'N/A') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '$2a$04$iutcR7UxPoGv0ywDuezLp.BlhjMYlwogbhpO7XBFeHL2a7tMXf3Zi', 'http://localhost:3000/images/miku.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return

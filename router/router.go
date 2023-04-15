@@ -40,6 +40,7 @@ func (r *Router) SetupRouter() {
 	user.GET("/get-me", r.UserHandler.GetMe, r.AuthMiddleware.Authorize())
 	user.GET("/all", r.UserHandler.GetAllUsers, r.AuthMiddleware.Authorize())
 	user.PATCH("/update", r.UserHandler.UpdateUser, r.AuthMiddleware.Authorize())
+	user.PATCH("/manage", r.UserHandler.AdminUpdateUser, r.AuthMiddleware.Authorize())
 	user.DELETE("/delete", r.UserHandler.DeleteUser, r.AuthMiddleware.Authorize())
 	user.GET("/admin-check", r.UserHandler.CheckAdmin)
 

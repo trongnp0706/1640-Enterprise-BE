@@ -481,6 +481,57 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 	})
 }
 
+type AdminUpdateUserRequest struct {
+	UserName     string `json:"user_name"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	RoleTicker   string `json:"role_ticker"`
+	DepartmentID string `json:"department_id"`
+	Avatar       string `json:"avatar"`
+	ID           string `json:"id"`
+}
+
+type AdminUserUpdateResponse struct {
+	User sql.User `json:"user"`
+}
+
+func (u *UserHandler) AdminUpdateUser(c echo.Context) error {
+	req := AdminUpdateUserRequest{}
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	param := sql.UpdateUserParams{
+		Username:     req.UserName,
+		Email:        req.Email,
+		Password:     req.Password,
+		RoleTicker:   req.RoleTicker,
+		DepartmentID: req.DepartmentID,
+		Avatar:       req.Avatar,
+		ID:           req.ID,
+	}
+	err, user := u.UserRepo.UpdateUser(c.Request().Context(), param)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	userRes := AdminUserUpdateResponse{
+		User: user,
+	}
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    "Success",
+		Data:       userRes,
+	})
+}
+
 type DeleteUserRequest struct {
 	Id string `json:"id"`
 }

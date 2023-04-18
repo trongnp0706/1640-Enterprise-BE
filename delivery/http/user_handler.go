@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"GDN-delivery-management/mail"
-	"GDN-delivery-management/otp"
-
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -28,6 +26,7 @@ type AddUserRequest struct {
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Password     string `json:"password"`
+	Avatar       string `json:"avatar"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
 }
@@ -53,12 +52,14 @@ func (u *UserHandler) AddUser(c echo.Context) error {
 		})
 	}
 	req.ID = userId.String()
-	param := sql.CreatUserParams{
+	req.Avatar = "http://localhost:3000/images/nino.jpg"
+	param := sql.CreateUserParams{
 		ID:           req.ID,
 		Email:        req.Email,
 		Username:     req.Username,
 		RoleTicker:   req.RoleTicker,
 		Password:     req.Password,
+		Avatar:       req.Avatar,
 		DepartmentID: req.DepartmentID,
 	}
 	err, user := u.UserRepo.AddUser(c.Request().Context(), param)
@@ -128,7 +129,7 @@ func (u *UserHandler) SystemAdminSignUp(c echo.Context) error {
 		})
 	}
 	req.ID = userId.String()
-	param := sql.CreatUserParams{
+	param := sql.CreateUserParams{
 		ID:           req.ID,
 		Email:        req.Email,
 		Username:     req.Username,
@@ -165,7 +166,9 @@ func (u *UserHandler) UserDetails(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	err, user := u.UserRepo.GetUserByID(c.Request().Context(), req.ID)
+	userId := req.ID
+	userId = c.Param("userid")
+	err, user := u.UserRepo.GetUserByID(c.Request().Context(), userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
 			StatusCode: http.StatusInternalServerError,
@@ -221,82 +224,7 @@ func (u UserHandler) Login(c echo.Context) error {
 		})
 	}
 
-	if user.RoleTicker == "SAD" {
-		// handle OTP
-		code, err := otp.TwilioSendOTP(user.Email)
-		if err != nil {
-			fmt.Println(err)
-			return c.JSON(http.StatusInternalServerError, Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    "Unable to send OTP",
-				Data:       nil,
-			})
-		}
-		fmt.Println("code Twilio", code)
-		//send email
-		err = u.Email.SendEmail("OTP", "OTP code", []string{user.Email}, nil, nil, nil)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    "Unable to send mail",
-				Data:       nil,
-			})
-		}
-		// gen token
-		token, token_payload, err := security.Gentoken(user)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    err.Error(),
-				Data:       nil,
-			})
-		}
-		refresh_token, refresh_token_payload, err := security.GenRefreshtoken(user)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    err.Error(),
-				Data:       nil,
-			})
-		}
-		sessID, _ := uuid.NewUUID()
-		sessionParam := sql.CreateSessionParams{
-			ID:           sessID.String(),
-			UserID:       user.ID,
-			RefreshToken: refresh_token,
-			UserAgent:    "agent",
-			ClientIp:     "ip",
-			IsBlocked:    false,
-			ExpiresAt:    int64(refresh_token_payload.ExpiresAt),
-			CreatedAt:    time.Now(),
-		}
-
-		err, sess := u.SessionRepo.AddSession(c.Request().Context(), sessionParam)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Response{
-				StatusCode: http.StatusInternalServerError,
-				Message:    err.Error(),
-				Data:       nil,
-			})
-		}
-
-		userRes := UserLoginResponse{
-			User:                  user,
-			SessionID:             sess.ID,
-			AccessToken:           token,
-			AccessTokenExpiresAt:  token_payload.ExpiresAt,
-			RefreshToken:          refresh_token,
-			RefreshTokenExpiresAt: refresh_token_payload.ExpiresAt,
-		}
-
-		return c.JSON(http.StatusOK, Response{
-			StatusCode: http.StatusOK,
-			Message:    "Success",
-			Data:       userRes,
-		})
-	}
-
-	token, token_payload, err := security.Gentoken(user)
+	token, token_payload, err := security.GenToken(user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Response{
 			StatusCode: http.StatusInternalServerError,
@@ -417,7 +345,7 @@ func (u *UserHandler) RenewAccessToken(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	accessToken, _, err := security.Gentoken(sql.User{
+	accessToken, _, err := security.GenToken(sql.User{
 		ID:    refresh_payload.UserId,
 		Email: refresh_payload.Email,
 	})
@@ -501,11 +429,17 @@ func (u *UserHandler) Logout(c echo.Context) error {
 }
 
 type UpdateUserRequest struct {
-	UserName   string `json:"user_name"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	RoleTicker string `json:"role_ticker"`
-	ID         string `json:"id"`
+	UserName     string `json:"user_name"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	RoleTicker   string `json:"role_ticker"`
+	DepartmentID string `json:"department_id"`
+	Avatar       string `json:"avatar"`
+	ID           string `json:"id"`
+}
+
+type UserUpdateResponse struct {
+	User sql.User `json:"user"`
 }
 
 func (u *UserHandler) UpdateUser(c echo.Context) error {
@@ -518,12 +452,16 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+	hash := security.HashAndSalt([]byte(req.Password))
+	req.Password = hash
 	param := sql.UpdateUserParams{
-		Username:   req.UserName,
-		Email:      req.Email,
-		Password:   req.Password,
-		RoleTicker: req.RoleTicker,
-		ID:         req.ID,
+		Username:     req.UserName,
+		Email:        req.Email,
+		Password:     req.Password,
+		RoleTicker:   req.RoleTicker,
+		DepartmentID: req.DepartmentID,
+		Avatar:       req.Avatar,
+		ID:           req.ID,
 	}
 	err, user := u.UserRepo.UpdateUser(c.Request().Context(), param)
 	if err != nil {
@@ -533,10 +471,64 @@ func (u *UserHandler) UpdateUser(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+	userRes := UserUpdateResponse{
+		User: user,
+	}
 	return c.JSON(http.StatusOK, Response{
 		StatusCode: http.StatusOK,
 		Message:    "Success",
-		Data:       user,
+		Data:       userRes,
+	})
+}
+
+type AdminUpdateUserRequest struct {
+	UserName     string `json:"user_name"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	RoleTicker   string `json:"role_ticker"`
+	DepartmentID string `json:"department_id"`
+	Avatar       string `json:"avatar"`
+	ID           string `json:"id"`
+}
+
+type AdminUserUpdateResponse struct {
+	User sql.User `json:"user"`
+}
+
+func (u *UserHandler) AdminUpdateUser(c echo.Context) error {
+	req := AdminUpdateUserRequest{}
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	param := sql.UpdateUserParams{
+		Username:     req.UserName,
+		Email:        req.Email,
+		Password:     req.Password,
+		RoleTicker:   req.RoleTicker,
+		DepartmentID: req.DepartmentID,
+		Avatar:       req.Avatar,
+		ID:           req.ID,
+	}
+	err, user := u.UserRepo.UpdateUser(c.Request().Context(), param)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	userRes := AdminUserUpdateResponse{
+		User: user,
+	}
+	return c.JSON(http.StatusOK, Response{
+		StatusCode: http.StatusOK,
+		Message:    "Success",
+		Data:       userRes,
 	})
 }
 

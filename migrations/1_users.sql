@@ -4,6 +4,7 @@ CREATE TABLE "users" (
                          "username" varchar NOT NULL,
                          "email" varchar NOT NULL UNIQUE,
                          "password" varchar NOT NULL,
+                         "avatar" varchar NOT NULL,
                          "role_ticker" varchar NOT NULL,
                          "department_id" varchar NOT NULL,
                          CONSTRAINT "users_pk" PRIMARY KEY ("id")

@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -14,16 +15,17 @@ type AcademicYear struct {
 }
 
 type Category struct {
-	ID         string `json:"id"`
-	CategoryID string `json:"category_id"`
+	ID           string `json:"id"`
+	CategoryName string `json:"category_name"`
 }
 
 type Comment struct {
-	ID          string `json:"id"`
-	Content     string `json:"content"`
-	IsAnonymous bool   `json:"is_anonymous"`
-	UserID      string `json:"user_id"`
-	IdeaID      string `json:"idea_id"`
+	ID          string    `json:"id"`
+	Content     string    `json:"content"`
+	IsAnonymous bool      `json:"is_anonymous"`
+	UserID      string    `json:"user_id"`
+	IdeaID      string    `json:"idea_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Department struct {
@@ -32,17 +34,19 @@ type Department struct {
 }
 
 type Idea struct {
-	ID            string `json:"id"`
-	Title         string `json:"title"`
-	Content       string `json:"content"`
-	ViewCount     int32  `json:"view_count"`
-	ImageArray    string `json:"image_array"`
-	UpvoteCount   int32  `json:"upvote_count"`
-	DownvoteCount int32  `json:"downvote_count"`
-	IsAnonymous   bool   `json:"is_anonymous"`
-	UserID        string `json:"user_id"`
-	CategoryID    string `json:"category_id"`
-	AcademicYear  string `json:"academic_year"`
+	ID            string         `json:"id"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ViewCount     int32          `json:"view_count"`
+	DocumentArray sql.NullString `json:"document_array"`
+	ImageArray    []string       `json:"image_array"`
+	UpvoteCount   int32          `json:"upvote_count"`
+	DownvoteCount int32          `json:"downvote_count"`
+	IsAnonymous   bool           `json:"is_anonymous"`
+	UserID        string         `json:"user_id"`
+	CategoryID    string         `json:"category_id"`
+	AcademicYear  string         `json:"academic_year"`
+	CreatedAt     time.Time      `json:"created_at"`
 }
 
 type Role struct {
@@ -66,6 +70,14 @@ type User struct {
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Password     string `json:"password"`
+	Avatar       string `json:"avatar"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
+}
+
+type Vote struct {
+	ID     string `json:"id"`
+	UserID string `json:"user_id"`
+	IdeaID string `json:"idea_id"`
+	Vote   string `json:"vote"`
 }

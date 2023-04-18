@@ -1,8 +1,8 @@
--- name: CreatUser :one
+-- name: CreateUser :one
 INSERT INTO users(
-    id, username, email, password, role_ticker, department_id
+    id, username, email, password, avatar, role_ticker, department_id
 ) VALUES (
-    $1,  $2,  $3,  $4, $5, $6
+    $1,  $2,  $3,  $4, $5, $6, $7
 )
 RETURNING *;
 
@@ -19,8 +19,8 @@ OFFSET $2;
 
 -- name: UpdateUser :one
 UPDATE users
-SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5
-WHERE id = $6
+SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5, avatar = $6
+WHERE id = $7
 RETURNING *;
 
 -- name: DeleteUser :one

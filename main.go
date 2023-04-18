@@ -9,6 +9,7 @@ import (
 	"GDN-delivery-management/router"
 	"database/sql"
 	"github.com/labstack/echo/v4"
+	migrate "github.com/rubenv/sql-migrate"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +17,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
-	migrate "github.com/rubenv/sql-migrate"
 )
 
 func main() {
@@ -26,13 +26,105 @@ func main() {
 	}
 	psqlInfo := os.Getenv("DBSOURCE")
 	driver, err := sql.Open("postgres", psqlInfo)
+	Migrate(driver)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	Migrate(driver)
+
 	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
 								VALUES ('System Admin', 'SAD') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('QA Manager', 'QAM') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('Quality Assurance Coordinator', 'QAC') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO roles (role_name, ticker) 
+								VALUES ('User', 'USR') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
+								VALUES ('None', 'N/A') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO departments (department_name, id) 
+								VALUES ('First Department', 'FDP') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174002', 'System Admin', 'admin@gmail.com', '$2a$04$vx/bEre7k.qlSeVx/DaOcefXX4BBcQJ4326drbJO3ViuhHWAjyrxG', 'http://localhost:3000/images/nino.jpg', 'SAD', 'N/A') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO users (id, username, email, password, avatar, role_ticker, department_id) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174001', 'John Doe', 'johndoe@gmail.com', '$2a$04$iutcR7UxPoGv0ywDuezLp.BlhjMYlwogbhpO7XBFeHL2a7tMXf3Zi', 'http://localhost:3000/images/miku.jpg', 'USR', 'FDP') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO categories (category_name, id) 
+								VALUES ('Category', 'CAT') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO categories (category_name, id) 
+								VALUES ('Dogegory', 'DOG') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO academic_years (closure_date, academic_year) 
+								VALUES ('2023-03-28 10:30:00-07', '2022') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO academic_years (closure_date, academic_year) 
+								VALUES ('2024-03-28 10:30:00-07', '2023') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO ideas (id, title, content, view_count, image_array, upvote_count, downvote_count, is_anonymous, user_id, category_id, academic_year, created_at) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174000', 'Title', 'Content', 0, NULL, 0, 0, FALSE, '123e4567-e89b-12d3-a456-426614174001', 'CAT', '2022', '2023-03-28 10:30:00-07') ON CONFLICT DO NOTHING`)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = driver.Exec(`INSERT INTO comments (id, content, is_anonymous, user_id, idea_id, created_at) 
+								VALUES ('123e4567-e89b-12d3-a456-426614174000','Content', FALSE, '123e4567-e89b-12d3-a456-426614174001', '123e4567-e89b-12d3-a456-426614174000', '2023-03-28 10:30:00-07') ON CONFLICT DO NOTHING`)
 	if err != nil {
 		log.Println(err)
 		return
@@ -41,6 +133,12 @@ func main() {
 	userRepo := repository.NewUserRepo(queries)
 	sessionRepo := repository.NewSessionRepo(queries)
 	roleRepo := repository.NewRoleRepo(queries)
+	ideaRepo := repository.NewIdeaRepo(queries)
+	commentRepo := repository.NewCommentRepo(queries)
+	departmentRepo := repository.NewDepartmentRepo(queries)
+	categoryRepo := repository.NewCategoryRepo(queries)
+	academicYearRepo := repository.NewAcademicYearRepo(queries)
+	voteRepo := repository.NewVoteRepo(queries)
 	gmail := mail.NewGmailSender(os.Getenv("EMAIL_SENDER_NAME"), os.Getenv("EMAIL_SENDER_ADDRESS"), os.Getenv("EMAIL_SENDER_PASSWORD"))
 	userHandle := handle.UserHandler{
 		UserRepo:    userRepo,
@@ -50,21 +148,46 @@ func main() {
 	roleHandler := handle.RoleHandler{
 		RoleRepo: roleRepo,
 	}
-
+	ideaHandler := handle.IdeaHandler{
+		IdeaRepo: ideaRepo,
+	}
+	commentHandler := handle.CommentHandler{
+		CommentRepo: commentRepo,
+	}
+	departmentHandler := handle.DepartmentHandler{
+		DepartmentRepo: departmentRepo,
+	}
+	categoryHandler := handle.CategoryHandler{
+		CategoryRepo: categoryRepo,
+	}
+	academicYearHandler := handle.AcademicYearHandler{
+		AcademicYearRepo: academicYearRepo,
+	}
+	voteHandler := handle.VoteHandler{
+		VoteRepo: voteRepo,
+		IdeaRepo: ideaRepo,
+	}
 	authMiddleware := mdw.NewAuthMiddleware(roleRepo, userRepo, accessibleRoles())
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
-	router := router.Router{
-		Echo:           e,
-		UserHandler:    userHandle,
-		RoleHandler:    roleHandler,
-		AuthMiddleware: authMiddleware,
+	routerSetup := router.Router{
+		Echo:                e,
+		UserHandler:         userHandle,
+		RoleHandler:         roleHandler,
+		IdeaHandler:         ideaHandler,
+		CommentHandler:      commentHandler,
+		DepartmentHandler:   departmentHandler,
+		CategoryHandler:     categoryHandler,
+		AcademicYearHandler: academicYearHandler,
+		VoteHandler:         voteHandler,
+		AuthMiddleware:      authMiddleware,
 	}
-	router.SetupRouter()
+	routerSetup.SetupRouter()
 	e.Logger.Fatal(e.Start(":1313"))
 }
 
@@ -86,20 +209,16 @@ func Migrate(db *sql.DB) {
 
 func accessibleRoles() map[string][]string {
 	return map[string][]string{
-		"user/add-user":        {"SAD", "GL"},
-		"user/update-user":     {"SAD", "GL"},
-		"user/delete-user":     {"SAD", "GL"},
-		"user/add-avatar":      {"SAD", "GL"},
-		"user/all-user":        {"SAD", "GL"},
-		"user/profile":         {"SAD", "GL", "PM"},
-		"user/get-me":          {"SAD", "GL", "PM"},
-		"role/add-role":        {"SAD", "GL"},
-		"role/all-role":        {"SAD", "GL"},
-		"role/update-role":     {"SAD", "GL"},
-		"role/delete-role":     {"SAD", "GL"},
-		"client/add-client":    {"SAD", "GL"},
-		"client/all-client":    {"SAD", "GL"},
-		"client/update-client": {"SAD", "GL"},
-		"client/close-client":  {"SAD", "GL"},
+		"user/add-user":    {"SAD", "GL"},
+		"user/update-user": {"SAD", "GL"},
+		"user/delete-user": {"SAD", "GL"},
+		"user/add-avatar":  {"SAD", "GL"},
+		"user/all-user":    {"SAD", "GL"},
+		"user/profile":     {"SAD", "GL", "PM"},
+		"user/get-me":      {"SAD", "GL", "PM"},
+		"role/add-role":    {"SAD", "GL"},
+		"role/all-role":    {"SAD", "GL"},
+		"role/update-role": {"SAD", "GL"},
+		"role/delete-role": {"SAD", "GL"},
 	}
 }

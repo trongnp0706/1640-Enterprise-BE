@@ -12,7 +12,7 @@ import (
 )
 
 type IUserRepo interface {
-	AddUser(ctx context.Context, imput entity.CreatUserParams) (error, entity.User)
+	AddUser(ctx context.Context, imput entity.CreateUserParams) (error, entity.User)
 	GetUserByID(ctx context.Context, id string) (error, entity.User)
 	GetUserByEmail(ctx context.Context, email string) (error, entity.User)
 	GetAllUsers(ctx context.Context, input entity.GetAllUsersParams) (error, []entity.GetAllUsersRow)
@@ -30,8 +30,8 @@ func NewUserRepo(sql *entity.Queries) IUserRepo {
 	}
 }
 
-func (u *UserRepo) AddUser(ctx context.Context, imput entity.CreatUserParams) (error, entity.User) {
-	user, err := u.sql.CreatUser(ctx, imput)
+func (u *UserRepo) AddUser(ctx context.Context, imput entity.CreateUserParams) (error, entity.User) {
+	user, err := u.sql.CreateUser(ctx, imput)
 	if err != nil {
 		if err, ok := err.(*pq.Error); ok {
 			if err.Code.Name() == "unique_violation" {

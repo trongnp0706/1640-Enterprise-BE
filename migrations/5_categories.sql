@@ -1,7 +1,7 @@
 -- +migrate Up
 CREATE TABLE "categories" (
                               "id" varchar NOT NULL,
-                              "category_id" varchar NOT NULL,
+                              "category_name" varchar NOT NULL,
                               CONSTRAINT "categories_pk" PRIMARY KEY ("id")
 );
 

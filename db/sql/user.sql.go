@@ -9,30 +9,32 @@ import (
 	"context"
 )
 
-const creatUser = `-- name: CreatUser :one
+const createUser = `-- name: CreateUser :one
 INSERT INTO users(
-    id, username, email, password, role_ticker, department_id
+    id, username, email, password, avatar, role_ticker, department_id
 ) VALUES (
-    $1,  $2,  $3,  $4, $5, $6
+    $1,  $2,  $3,  $4, $5, $6, $7
 )
-RETURNING id, username, email, password, role_ticker, department_id
+RETURNING id, username, email, password, avatar, role_ticker, department_id
 `
 
-type CreatUserParams struct {
+type CreateUserParams struct {
 	ID           string `json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Password     string `json:"password"`
+	Avatar       string `json:"avatar"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
 }
 
-func (q *Queries) CreatUser(ctx context.Context, arg CreatUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, creatUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser,
 		arg.ID,
 		arg.Username,
 		arg.Email,
 		arg.Password,
+		arg.Avatar,
 		arg.RoleTicker,
 		arg.DepartmentID,
 	)
@@ -42,6 +44,7 @@ func (q *Queries) CreatUser(ctx context.Context, arg CreatUserParams) (User, err
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)
@@ -51,7 +54,7 @@ func (q *Queries) CreatUser(ctx context.Context, arg CreatUserParams) (User, err
 const deleteUser = `-- name: DeleteUser :one
 DELETE FROM users
 WHERE id = $1
-RETURNING id, username, email, password, role_ticker, department_id
+RETURNING id, username, email, password, avatar, role_ticker, department_id
 `
 
 func (q *Queries) DeleteUser(ctx context.Context, id string) (User, error) {
@@ -62,6 +65,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (User, error) {
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)
@@ -69,7 +73,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (User, error) {
 }
 
 const getAllUsers = `-- name: GetAllUsers :many
-Select id, username, email, password, role_ticker, department_id FROM users ORDER BY created_at
+Select id, username, email, password, avatar, role_ticker, department_id FROM users ORDER BY created_at
 LIMIT $1
 OFFSET $2
 `
@@ -84,11 +88,10 @@ type GetAllUsersRow struct {
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	Password     string `json:"password"`
+	Avatar       string `json:"avatar"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
 }
-
-
 
 func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]GetAllUsersRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllUsers, arg.Limit, arg.Offset)
@@ -104,6 +107,7 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]Get
 			&i.Username,
 			&i.Email,
 			&i.Password,
+			&i.Avatar,
 			&i.RoleTicker,
 			&i.DepartmentID,
 		); err != nil {
@@ -121,7 +125,7 @@ func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]Get
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password, role_ticker, department_id FROM users WHERE email = $1
+SELECT id, username, email, password, avatar, role_ticker, department_id FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -132,6 +136,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)
@@ -139,7 +144,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, username, email, password, role_ticker, department_id FROM users WHERE id = $1
+SELECT id, username, email, password, avatar, role_ticker, department_id FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
@@ -150,6 +155,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)
@@ -158,9 +164,9 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
-SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5
-WHERE id = $6
-RETURNING id, username, email, password, role_ticker, department_id
+SET username = $1, email = $2, password = $3, role_ticker = $4, department_id = $5, avatar = $6
+WHERE id = $7
+RETURNING id, username, email, password, avatar, role_ticker, department_id
 `
 
 type UpdateUserParams struct {
@@ -169,6 +175,7 @@ type UpdateUserParams struct {
 	Password     string `json:"password"`
 	RoleTicker   string `json:"role_ticker"`
 	DepartmentID string `json:"department_id"`
+	Avatar       string `json:"avatar"`
 	ID           string `json:"id"`
 }
 
@@ -179,6 +186,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.Password,
 		arg.RoleTicker,
 		arg.DepartmentID,
+		arg.Avatar,
 		arg.ID,
 	)
 	var i User
@@ -187,6 +195,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Username,
 		&i.Email,
 		&i.Password,
+		&i.Avatar,
 		&i.RoleTicker,
 		&i.DepartmentID,
 	)
